@@ -1,0 +1,21 @@
+.header {
+    padding: 0.5rem 2rem;
+    background-color: #111;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    display: flex;
+    /* Use flexbox for layout */
+    justify-content: space-between;
+    /* Space between the two <p> elements */
+    align-items: center;
+    /* Vertically align the items in the center */
+    width: 100%;
+    /* Make sure the header takes up the full width */
+}
+
+.directions-button:hover {
+    color: #aaa;
+}

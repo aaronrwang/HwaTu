@@ -1,0 +1,35 @@
+.room {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+}
+
+.waiting-screen {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: larger;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+}
+
+.link {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem;
+    border: 2px solid #181818;
+    border-radius: 0.5rem;
+    transition: background-color ease 0.2s;
+
+}
+
+.link:hover {
+    background-color: #666;
+}

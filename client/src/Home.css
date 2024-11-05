@@ -1,0 +1,51 @@
+.home-page {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+}
+
+.home-body {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: larger;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+}
+
+.home-body>h1 {
+    font-size: 3.2em;
+    line-height: 1.1;
+}
+
+.home-body-buttons {}
+
+.home-body-buttons>button {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    width: 8rem;
+    background-color: #1a1a1a;
+    cursor: pointer;
+    margin: 1rem;
+    transition: border-color 0.25s;
+}
+
+.home-body-buttons>button:hover {
+    border-color: #646cff;
+}
+
+.home-body-buttons>button:focus,
+.home-body-buttons>button:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+}
