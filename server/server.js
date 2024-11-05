@@ -51,9 +51,15 @@ io.on('connection', (socket) => {
         io.to(sockets[socket.id]).emit('message', message);
     });
 
-    function startGame(room) {
-        io.to(room).emit("startGame");
+    // function startGame(room) {
+    //     io.to(room).emit("startGame");
+    // }
+    function startGame(room) {  // Default delay is 1000 ms (1 second)
+        setTimeout(() => {
+            io.to(room).emit("startGame");
+        }, 1000);
     }
+
     function endGame(room) {
         io.to(room).emit("endGame");
     }
@@ -93,8 +99,9 @@ io.on('connection', (socket) => {
     });
 
     // 0: Perfectly executed
-    // 1: already connected
-    // 2: Room not available
+    // 1: already connected (waiting for friend)
+    // 2: already connected (waiting for stranger)
+    // 3: Room not available
 
     // if its a friend room thats open join
     // friend room thats close -> send to home page
@@ -117,9 +124,14 @@ io.on('connection', (socket) => {
         } else {
             let r = sockets[socket.id]
             if (r == roomId) {
-                callback(1);
+                index = fullPrivateRooms.indexOf(roomId);
+                if (index !== -1) {
+                    callback(1);
+                } else {
+                    callback(2);
+                }
             } else {
-                callback(2);
+                callback(3);
             }
 
         }

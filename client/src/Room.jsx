@@ -11,10 +11,21 @@ const Room = () => {
     const navigate = useNavigate();
     const [game, startGame] = useState(false);
     const { roomId } = useParams();
+    const [priv, setPrivate] = useState(false);
+    const [pub, setPublic] = useState(false);
+
+    // 0: Perfectly executed
+    // 1: already connected (waiting for friend)
+    // 2: already connected (waiting for stranger)
+    // 3: Room not available
     function callback(code) {
         console.log(code);
-        if (code === 2) {
+        if (code === 3) {
             navigate(`/`);
+        } else if (code === 2) {
+            setPublic(true);
+        } else {
+            setPrivate(true);
         }
     }
     useEffect(() => {
@@ -44,9 +55,13 @@ const Room = () => {
         <div className='room'>
             <Header page={`Room: ${roomId}`} />
 
-            {!game && <div className='waiting-screen'>
+            {!game && priv && <div className='waiting-screen'>
                 <h1>Waiting for friend...</h1>
                 <Gamelink link={domain + '/game/' + roomId} />
+
+            </div>}
+            {!game && pub && <div className='waiting-screen'>
+                <h1>Waiting for Opponent...</h1>
 
             </div>}
             {game && <>
