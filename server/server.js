@@ -10,12 +10,20 @@ const server = createServer(app);
 // Enable CORS for all routes
 app.use(cors());
 
+// Enable CORS for all HTTP routes
+app.use(cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",  // Allow requests from your frontend (local or production)
+    methods: ["GET", "POST"],  // Allow these methods for general API routes
+    allowedHeaders: ["my-custom-header"],  // Specify allowed headers if needed
+    credentials: true  // Allow cookies and credentials if you're using them
+}));
+
 const io = new Server(server, {
     cors: {
-        origin: process.env.FRONTEND_URL || "http://localhost:5173",
-        methods: ["GET", "POST"],
-        allowedHeaders: ["my-custom-header"],
-        credentials: true
+        origin: process.env.FRONTEND_URL || "http://localhost:5173",  // Allow WebSocket connections from the same frontend URL
+        methods: ["GET", "POST"],  // Allow these methods for WebSocket communication
+        allowedHeaders: ["my-custom-header"],  // Specify allowed headers if needed
+        credentials: true  // Allow credentials (cookies, sessions, etc.)
     }
 });
 let users = []; //list of user names
