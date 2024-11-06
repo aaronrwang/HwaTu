@@ -6,7 +6,7 @@ import Gamelink from './Gamelink.jsx';
 import Header from './Header.jsx';
 
 const Room = () => {
-    const domain = 'http://localhost:5173'
+    const domain = "http://localhost:5173";
     const [messages, setMessages] = useState([]);
     const navigate = useNavigate();
     const [game, startGame] = useState(false);
@@ -39,6 +39,7 @@ const Room = () => {
         });
         socket.on('endGame', () => {
             startGame(false);
+            setMessages([]);
         });
 
         return () => {
@@ -64,14 +65,24 @@ const Room = () => {
                 <h1>Waiting for Opponent...</h1>
 
             </div>}
-            {game && <>
-                <button onClick={sendMessage}>Send Message</button>
-                <ul>
-                    {messages.map((msg, index) => (
-                        <li key={index}>{msg}</li>
-                    ))}
-                </ul>
-            </>}
+            {game && <div className='game-screen'>
+                <div className="game-main">
+                    <div className="p1"></div>
+                    <div className="middle"></div>
+                    <div className="p2"></div>
+                </div>
+                <div className="side-bar">
+                    <div className="history"></div>
+                    <div className="score">
+                        <p>P1:10</p>
+                        <p>P2:10</p>
+                    </div>
+                    <div className="chat">
+                        <button onClick={sendMessage}>Send Message</button>
+                        <ul>{messages.map((msg, index) => (<li key={index}>{msg}</li>))}</ul>
+                    </div>
+                </div>
+            </div>}
         </div>
     );
 };
