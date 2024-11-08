@@ -31,11 +31,6 @@ body {
   height: 100vh;
 }
 
-#root {
-  width: 100vw;
-  height: 100vh;
-}
-
 /* Reset margins and padding */
 * {
   margin: 0;

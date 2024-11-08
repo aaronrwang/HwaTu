@@ -1,12 +1,15 @@
 import './Room.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import socket from './socket';
 import Gamelink from './Gamelink.jsx';
 import Header from './Header.jsx';
+import Card from './Card.jsx';
+import back from './assets/Cards/000.png';
 
 const Room = () => {
     const domain = "http://localhost:5173";
+    const outgoingMessage = useRef();
     const [messages, setMessages] = useState([]);
     const navigate = useNavigate();
     const [game, startGame] = useState(false);
@@ -48,7 +51,8 @@ const Room = () => {
         };
     }, [roomId]);
     const sendMessage = () => {
-        const message = `Hello from ${socket.id}`;
+        const message = `${socket.id}: ${outgoingMessage.current.value}`;
+        outgoingMessage.current.value = '';
         socket.emit('message', message);
     };
 
@@ -67,17 +71,34 @@ const Room = () => {
             </div>}
             {game && <div className='game-screen'>
                 <div className="game-main">
-                    <div className="p1"></div>
-                    <div className="middle"></div>
-                    <div className="p2"></div>
+                    <div className="p1">
+                        {Array.from({ length: 1 }, (_, index) => (
+                            <div className="card" key={index + 1}>
+                                <div className="card-inner flip-it">
+                                    <div className="card-back">
+                                        <img src={back} alt="Card Back" className="card-img" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="middle">
+                    </div>
+                    <div className="p2">
+                        {Array.from({ length: 10 }, (_, index) => (
+                            <Card key={index + 1} cardId={index + 1} />
+                        ))}
+                    </div>
                 </div>
                 <div className="side-bar">
-                    <div className="history"></div>
                     <div className="score">
-                        <p>P1:10</p>
-                        <p>P2:10</p>
+                        <div>P1:10</div>
+                        <div>P2:10</div>
                     </div>
+                    <div className="history"></div>
+
                     <div className="chat">
+                        <input type='text' ref={outgoingMessage}></input>
                         <button onClick={sendMessage}>Send Message</button>
                         <ul>{messages.map((msg, index) => (<li key={index}>{msg}</li>))}</ul>
                     </div>
