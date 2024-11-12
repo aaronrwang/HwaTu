@@ -1,8 +1,16 @@
 .card {
-    --card-width: 60px;
+    --card-width: 90px;
     --card-height: 120px;
     height: var(--card-height);
     width: var(--card-width);
+    perspective: 1000px;
+    cursor: pointer;
+    z-index: 0;
+}
+
+.card-mini {
+    width: 45px;
+    height: 60px;
     perspective: 1000px;
     cursor: pointer;
     z-index: 0;
@@ -15,7 +23,7 @@
     text-align: center;
     transition: transform 0.6s;
     transform-style: preserve-3d;
-    border-radius: 10px;
+    /* border-radius: 10px; */
 }
 
 .card-front,
@@ -40,6 +48,14 @@
 
 .card:hover .card-inner.usable {
     transform: translateY(-30px) translateX(-30px);
+}
+
+.card-mini:hover .card-mini {
+    transform: translateZ(3);
+}
+
+.card-inner.usable {
+    box-shadow: #282828 15px 5px 5px;
 }
 
 .card-inner.flip-it {

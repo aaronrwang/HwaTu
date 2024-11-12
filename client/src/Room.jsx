@@ -69,7 +69,7 @@ const Room = () => {
                 <h1>Waiting for Opponent...</h1>
 
             </div>}
-            {game && <div className='game-screen'>
+            {game && <><div className='game-screen'>
                 <div className="game-main">
                     <div className="p1">
                         {Array.from({ length: 1 }, (_, index) => (
@@ -83,19 +83,89 @@ const Room = () => {
                         ))}
                     </div>
                     <div className="middle">
+                        <div className="piles">
+                            {Array.from({ length: 12 }, (_, index) => (
+                                <div className="pile" id={`pile-${index}`} key={index + 1}>
+                                    {Array.from({ length: 4 }, (_, index2) => (
+                                        <Card key={`${index * 4 + index2 + 1}`} cardId={`${index * 4 + index2 + 1}`} />
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+                        <div className="deck">
+                            <div className="card">
+                                <div className="card-inner flip-it">
+                                    <div className="card-back">
+                                        <img src={back} alt="Card Back" className="card-img" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div className="p2">
                         {Array.from({ length: 10 }, (_, index) => (
-                            <Card key={index + 1} cardId={index + 1} />
+                            <Card key={index + 1} cardId={index + 1} clickable={true} />
                         ))}
                     </div>
                 </div>
                 <div className="side-bar">
-                    <div className="score">
-                        <div>P1:10</div>
-                        <div>P2:10</div>
+                    <div className="stats">
+                        <div className="player-stats">
+                            <div>P1:10</div>
+                            <div className="used-card">
+                                {/* Junk, Ribbons, Animals, Brights */}
+                                <div className="used-cards">
+                                    {Array.from({ length: 10 }, (_, index) => (
+                                        <Card key={index + 1} cardId={index + 1} mini={true} />
+                                    ))}
+                                </div>
+                                <div className="used-cards">
+                                    {Array.from({ length: 10 }, (_, index) => (
+                                        <Card key={index + 1} cardId={index + 1} mini={true} />
+                                    ))}
+                                </div>
+                                <div className="used-cards">
+                                    {Array.from({ length: 10 }, (_, index) => (
+                                        <Card key={index + 1} cardId={index + 1} mini={true} />
+                                    ))}
+                                </div>
+                                <div className="used-cards">
+                                    {Array.from({ length: 10 }, (_, index) => (
+                                        <Card key={index + 1} cardId={index + 1} mini={true} />
+                                    ))}
+                                </div>
+
+                            </div>
+                        </div>
+                        <div className="player-stats">
+                            <div>P2:10</div>
+                            <div className="used-card">
+                                {/* Junk, Ribbons, Animals, Brights */}
+                                <div className="used-cards">
+                                    {Array.from({ length: 10 }, (_, index) => (
+                                        <Card key={index + 1} cardId={index + 1} mini={true} />
+                                    ))}
+                                </div>
+                                <div className="used-cards">
+                                    {Array.from({ length: 10 }, (_, index) => (
+                                        <Card key={index + 1} cardId={index + 1} mini={true} />
+                                    ))}
+                                </div>
+                                <div className="used-cards">
+                                    {Array.from({ length: 10 }, (_, index) => (
+                                        <Card key={index + 1} cardId={index + 1} mini={true} />
+                                    ))}
+                                </div>
+                                <div className="used-cards">
+                                    {Array.from({ length: 10 }, (_, index) => (
+                                        <Card key={index + 1} cardId={index + 1} mini={true} />
+                                    ))}
+                                </div>
+
+                            </div>
+                        </div>
+
                     </div>
-                    <div className="history"></div>
 
                     <div className="chat">
                         <input type='text' ref={outgoingMessage}></input>
@@ -103,7 +173,7 @@ const Room = () => {
                         <ul>{messages.map((msg, index) => (<li key={index}>{msg}</li>))}</ul>
                     </div>
                 </div>
-            </div>}
+            </div><div className="mobile">Not Mobile Compatible</div></>}
         </div>
     );
 };

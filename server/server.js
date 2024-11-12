@@ -3,6 +3,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import { MyObject } from './game.js';
 
 const app = express();
 const server = createServer(app);
@@ -34,11 +35,6 @@ let vacantPrivateRooms = []
 let fullPrivateRooms = []
 let sockets = {}
 
-// app.get('/', (req, res) => {
-//     res.send('Server is running');
-// });
-// server.js (Node.js server)
-
 import shortid from 'shortid';
 
 io.on('connection', (socket) => {
@@ -59,9 +55,6 @@ io.on('connection', (socket) => {
         io.to(sockets[socket.id]).emit('message', message);
     });
 
-    // function startGame(room) {
-    //     io.to(room).emit("startGame");
-    // }
     function startGame(room) {  // Default delay is 1000 ms (1 second)
         setTimeout(() => {
             io.to(room).emit("startGame");
@@ -71,27 +64,32 @@ io.on('connection', (socket) => {
     function endGame(room) {
         io.to(room).emit("endGame");
     }
+
+    function createRoom(socket) {
+        let id = shortid.generate();
+        rooms[id] = [socket.id]
+        return id
+    }
     socket.on('joinRoom', (type, callback) => {
         let id;
         if (type === 'stranger') {
             if (vacantRooms.length > 0) {
                 id = vacantRooms[0]
-                rooms[vacantRooms[0]].push(socket.id)
-                fullRooms.push(vacantRooms.pop(0))
+                vacantRooms.pop(0)
+                rooms[id].push(socket.id)
+                fullRooms.push(id)
                 startGame(id)
             } else {
-                id = shortid.generate();
-                rooms[id] = [socket.id]
+                id = createRoom(socket)
                 vacantRooms.push(id)
             }
-
         } else if (type === 'friend') {
-            id = shortid.generate();
-            rooms[id] = [socket.id]
-            vacantPrivateRooms.push(id)
+            id = createRoom(socket)
+            vacantPrivateRooms.push(id);
         }
         sockets[socket.id] = id;
         socket.join(id);
+        callback(id);
         if (typeof callback === 'function') {
             callback(id);
         } else {
@@ -99,12 +97,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('leaveRoom', (callback) => {
-        leave(socket)
-        socket.leave(sockets[socket.id]);
-        sockets[socket.id] = null;
-        callback(0);
-    });
+
 
     // 0: Perfectly executed
     // 1: already connected (waiting for friend)
@@ -180,6 +173,13 @@ io.on('connection', (socket) => {
             }
         }
     }
+
+    socket.on('leaveRoom', (callback) => {
+        leave(socket)
+        socket.leave(sockets[socket.id]);
+        sockets[socket.id] = null;
+        callback(0);
+    });
 
     socket.on('disconnect', () => {
         console.log(socket.id, 'disconnected');

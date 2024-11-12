@@ -2,7 +2,7 @@
 .room {
     position: relative;
     height: 100vh;
-    width: 100%;
+    width: 100vw;
 }
 
 /* Common styles for waiting-screen and game-screen */
@@ -21,8 +21,7 @@
     flex-direction: column;
     text-align: center;
     gap: 1rem;
-    min-width: 600px;
-    overflow-x: auto;
+    overflow-x: scroll;
 }
 
 /* .link styling */
@@ -42,8 +41,49 @@
 /* .game-screen layout */
 .game-screen {
     display: grid;
-    grid-template-columns: 75% 24%;
+    grid-template-columns: 70% 29%;
     gap: 1%;
+    min-width: 750px;
+    overflow-x: auto;
+}
+
+.mobile {
+    margin-block: 100px;
+    display: none;
+}
+
+@media (max-width: 750px) {
+    .game-screen {
+        display: none !important;
+    }
+
+    .mobile {
+        display: block;
+    }
+}
+
+@media (max-width: 1000px) {
+    .game-screen {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .game-main {
+        background-color: blue;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .side-bar {
+        height: 20% !important;
+        grid-template-columns: 49% 49% !important;
+        grid-template-rows: 100% !important;
+    }
+
 }
 
 /* .game-main layout */
@@ -51,7 +91,9 @@
     background-color: blue;
     width: 100%;
     height: 100%;
-    min-height: fit-content;
+    /* min-height: fit-content; */
+    overflow-y: auto;
+    overflow-x: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -61,7 +103,6 @@
 .game-main .p1,
 .game-main .p2 {
     margin-block: 20px;
-    background-color: white;
     /* width: 600px; */
     height: 120px;
     display: flex;
@@ -72,9 +113,30 @@
 }
 
 
-.game-main .p2 {
-    background-color: orange;
+.middle {
+    display: grid;
+    grid-template-columns: 540px 90px;
+    gap: 40px;
+    align-items: center;
 }
+
+.piles {
+    display: grid;
+    grid-template-columns: repeat(4, 120px);
+    grid-template-rows: repeat(3, 120px);
+    gap: 20px;
+}
+
+.pile {
+    display: grid;
+    grid-template-columns: repeat(4, 15px);
+}
+
+.deck {
+    height: 120px;
+    width: 90px;
+}
+
 
 /* .side-bar layout */
 .side-bar {
@@ -82,33 +144,35 @@
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-rows: 6% 45% 45%;
+    grid-template-rows: 49% 49%;
     gap: 2%;
 }
 
-/* .side-bar .score layout */
-.side-bar .score {
-    background-color: orange;
+
+.side-bar .stats {
+    background-color: greenyellow;
     width: 100%;
     height: 100%;
     display: grid;
     grid-template-columns: 50% 50%;
-    gap: 0;
-    padding-block: 10px;
+    overflow-y: auto;
 }
 
-/* .side-bar .history styling */
-.side-bar .history {
-    background-color: greenyellow;
-    width: 100%;
-    height: 100%;
+.used-card {
+    height: fit-content;
 }
 
-/* .side-bar .chat layout */
+.used-cards {
+    height: 60px;
+    margin: 10px;
+    display: grid;
+    grid-template-columns: repeat(10, 10px);
+}
+
 .side-bar .chat {
     background-color: gray;
     width: 100%;
-    height: 100%;
+    overflow-y: auto;
 }
 
 .side-bar .chat ul {
@@ -116,18 +180,3 @@
     color: black;
     font-size: 1rem;
 }
-
-/* Media query example (commented out) */
-/* 
-@media (max-width: 900px) {
-    .game-screen {
-        display: grid;
-        grid-template-columns: 100%;
-    }
-
-    .side-bar {
-        display: none;
-    }
-} 
-*/
-/* Body and Grid Container for Centering */

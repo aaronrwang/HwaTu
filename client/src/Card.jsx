@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { getImageById } from './cardimg.js'; // Import the function to get the image by id
 import back from './assets/Cards/000.png';
 
-const Card = ({ cardId }) => {
+const Card = ({ cardId, hidden = false, mini = false, clickable = false }) => {
     const [imagePath, setImagePath] = useState(null); // State to store the front image path
 
     useEffect(() => {
@@ -19,8 +19,8 @@ const Card = ({ cardId }) => {
     }, [cardId]); // Re-run the effect when the card id changes
 
     return (
-        <div className="card">
-            <div className="card-inner usable">
+        <div className={mini ? 'card-mini' : 'card'} onClick={clickable ? () => console.log('hi') : undefined}>
+            <div className={`card-inner ${clickable ? 'usable' : ''} ${hidden ? 'flipped' : ''}`}>
                 <div className="card-front">
                     {imagePath ? (
                         <img src={imagePath} alt={`Card ${cardId}`} className="card-img" />
