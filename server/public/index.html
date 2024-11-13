@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms and Users</title>
+    <style>
+        /* Styles for the parent container to display items horizontally */
+        #rooms-list,
+        #users-list {
+            display: flex;
+            flex-wrap: wrap;
+            /* Wraps to next line if needed */
+            gap: 15px;
+            /* Space between each bubble */
+            padding: 0;
+            list-style-type: none;
+            /* Remove default list styling */
+        }
+
+        /* Styles for each bubble */
+        #rooms-list>li,
+        #users-list>li {
+            background-color: #f0f0f0;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            /* Fixed width for consistency */
+        }
+
+        /* Inner list for each room or user details */
+        #rooms-list ul,
+        #users-list ul {
+            padding: 0;
+            list-style-type: none;
+            /* Remove inner list styling */
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Rooms</h1>
+    <ul id="rooms-list"></ul>
+
+    <h1>Users</h1>
+    <ul id="users-list"></ul>
+
+    <script>
+        // Function to fetch data from the server
+        async function fetchData() {
+            try {
+                const response = await fetch('/data');
+                const data = await response.json();
+                // Display rooms
+                const roomsList = document.getElementById('rooms-list');
+                roomsList.innerHTML = ''; // Clear current list
+                data.rooms.forEach(room => {
+                    const li = document.createElement('li');
+
+                    // Create a nested <ul> for each room's details
+                    const roomDetails = document.createElement('ul');
+
+                    // Add room ID
+                    const idItem = document.createElement('li');
+                    idItem.textContent = `Room ID: ${room.id}`;
+                    roomDetails.appendChild(idItem);
+
+                    // Add user1
+                    const user1Item = document.createElement('li');
+                    user1Item.textContent = `User1: ${room.user1 ? room.user1.id : 'None'}`;
+                    roomDetails.appendChild(user1Item);
+
+                    // Add user2
+                    const user2Item = document.createElement('li');
+                    user2Item.textContent = `User2: ${room.user2 ? room.user2.id : 'None'}`;
+                    roomDetails.appendChild(user2Item);
+
+                    // Add privacy
+                    const privacyItem = document.createElement('li');
+                    privacyItem.textContent = `Privacy: ${room.privacy}`;
+                    roomDetails.appendChild(privacyItem);
+
+                    // Add game
+                    const gameItem = document.createElement('li');
+                    gameItem.textContent = `Game: ${room.game ? room.game.str : 'None'}`;
+                    roomDetails.appendChild(gameItem);
+
+                    // Append the nested <ul> to the main <li>
+                    li.appendChild(roomDetails);
+                    roomsList.appendChild(li);
+                });
+
+                // Display users
+                const usersList = document.getElementById('users-list');
+                usersList.innerHTML = ''; // Clear current list
+                data.users.forEach(user => {
+                    const li = document.createElement('li');
+
+                    // Create a nested <ul> for each user's details
+                    const userDetails = document.createElement('ul');
+
+                    // Add user id
+                    const idItem = document.createElement('li');
+                    idItem.textContent = `User ID: ${user.id}`;
+                    userDetails.appendChild(idItem);
+
+                    // Add user name
+                    const nameItem = document.createElement('li');
+                    nameItem.textContent = `Name: ${user.name}`;
+                    userDetails.appendChild(nameItem);
+
+                    // Add room id
+                    const roomItem = document.createElement('li');
+                    roomItem.textContent = `Room: ${user.roomid}`;
+                    userDetails.appendChild(roomItem);
+
+                    // Append the nested <ul> to the main <li>
+                    li.appendChild(userDetails);
+                    usersList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Refresh the data every 5 seconds
+        setInterval(fetchData, 5000);
+
+        // Initial data fetch on page load
+        fetchData();
+    </script>
+</body>
+
+
+</html>

@@ -3,7 +3,8 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import { MyObject } from './game.js';
+import shortid from 'shortid';
+import { Game } from './game.js';
 
 const app = express();
 const server = createServer(app);
@@ -11,6 +12,15 @@ const server = createServer(app);
 // Enable CORS for all routes
 app.use(cors());
 
+app.use(express.static('public'));
+
+// Route to send rooms and users data
+app.get('/data', (req, res) => {
+    res.json({
+        rooms: Object.values(rooms), // Convert dictionary to array
+        users: Array.from(users)      // Convert set to array
+    });
+});
 // Enable CORS for all HTTP routes
 app.use(cors({
     origin: process.env.FRONTEND_URL || "http://localhost:5173",  // Allow requests from your frontend (local or production)
@@ -27,37 +37,83 @@ const io = new Server(server, {
         credentials: true  // Allow credentials (cookies, sessions, etc.)
     }
 });
-let users = []; //list of user names
-let rooms = {}; // stores rooms and their connected sockets
-let vacantRooms = []
-let fullRooms = []
-let vacantPrivateRooms = []
-let fullPrivateRooms = []
-let sockets = {}
 
-import shortid from 'shortid';
+class User {
+    constructor(id, name = null, roomid = null) {
+        this.id = id;
+        this.name = name;
+        this.roomid = roomid;
+    }
+}
+
+class Room {
+
+    // 0:stranger vacant; 1: stranger full; 2: friend vacant; 3: friend full
+    static roomsByPrivacy = { 0: new Set(), 1: new Set(), 2: new Set(), 3: new Set() };
+
+    constructor(id, user1 = null, user2 = null, privacy = 0, game = null) {
+        this.id = id;
+        this.user1 = user1;
+        this.user2 = user2;
+        this.privacy = privacy;
+        this.game = new Game('0');
+        this.setPrivacy(privacy);
+    }
+
+    setPrivacy(newPrivacy) {
+        // If the room already exists in the previous privacy set, remove it
+        if (Room.roomsByPrivacy[this.privacy]) {
+            Room.roomsByPrivacy[this.privacy].delete(this);
+        }
+
+        // Update the room's privacy and add it to the appropriate set
+        this.privacy = newPrivacy;
+        if (Room.roomsByPrivacy[newPrivacy]) {
+            Room.roomsByPrivacy[newPrivacy].add(this);
+        } else {
+            console.warn(`Invalid privacy setting: ${newPrivacy}`);
+        }
+    }
+
+    // Static method to get all rooms with a specific privacy level
+    static getRoomsByPrivacy(privacy) {
+        return Array.from(Room.roomsByPrivacy[privacy] || []);
+    }
+
+    static deleteRoom(room) {
+        // Delete the room from the correct privacy set
+        if (Room.roomsByPrivacy[room.privacy]) {
+            Room.roomsByPrivacy[room.privacy].delete(room);
+            console.log(`Room with id ${room.id} deleted.`);
+        }
+    }
+}
+
+let users = new Set(); //list of user names
+let rooms = {};
 
 io.on('connection', (socket) => {
-    console.log('sockets:', sockets);
-    console.log('rooms:', rooms);
-    console.log('vacant:', vacantRooms);
-    console.log('full:', fullRooms);
-    console.log('vacant private:', vacantPrivateRooms);
-    console.log('full private:', fullPrivateRooms);
-    console.log(socket.id, 'connected');
-    users.push(socket.id)
-    console.log('users:', users);
-    sockets[socket.id] = null;
+    const user = new User(socket.id);
+    users.add(user);
+    let room = null;
 
     // Send message to room
     socket.on('message', (message) => {
-        console.log(message, sockets[socket.id]);
-        io.to(sockets[socket.id]).emit('message', message);
+        console.log(message, user.id);
+        io.to(room.id).emit('message', user.id, message);
     });
+    socket.on('name', (name) => {
+        user.name = name;
+        sendUsers();
+    });
+    function sendUsers() {
+        io.to(room.id).emit('users', [room.user1, room.user2]);
+    }
 
     function startGame(room) {  // Default delay is 1000 ms (1 second)
         setTimeout(() => {
             io.to(room).emit("startGame");
+            sendUsers()
         }, 1000);
     }
 
@@ -65,131 +121,89 @@ io.on('connection', (socket) => {
         io.to(room).emit("endGame");
     }
 
-    function createRoom(socket) {
-        let id = shortid.generate();
-        rooms[id] = [socket.id]
-        return id
-    }
+
     socket.on('joinRoom', (type, callback) => {
-        let id;
-        if (type === 'stranger') {
-            if (vacantRooms.length > 0) {
-                id = vacantRooms[0]
-                vacantRooms.pop(0)
-                rooms[id].push(socket.id)
-                fullRooms.push(id)
-                startGame(id)
+        if (type === 'friend') {
+            room = new Room(shortid.generate(), user, null, 2, null);
+        } else if (type === 'stranger') {
+            const openRooms = Room.getRoomsByPrivacy(0);
+            if (openRooms.length !== 0) {
+                room = openRooms.values().next().value;
+                room.user2 = user;
+                room.setPrivacy(1);
+                startGame(room.id);
             } else {
-                id = createRoom(socket)
-                vacantRooms.push(id)
+                room = new Room(shortid.generate(), user, null, 0, null);
             }
-        } else if (type === 'friend') {
-            id = createRoom(socket)
-            vacantPrivateRooms.push(id);
-        }
-        sockets[socket.id] = id;
-        socket.join(id);
-        callback(id);
-        if (typeof callback === 'function') {
-            callback(id);
         } else {
-            console.error('Callback is not a function');
+            console.log('misuse of joinRoom');
         }
+        rooms[room.id] = room;
+        user.roomid = room.id;
+        socket.join(room.id);
+        callback(room.id);
     });
 
-
-
-    // 0: Perfectly executed
-    // 1: already connected (waiting for friend)
-    // 2: already connected (waiting for stranger)
-    // 3: Room not available
-
-    // if its a friend room thats open join
-    // friend room thats close -> send to home page
-    // its the socket that just joined reloading -> do nothing
-    // its trying to join a non-existent / not available room
     socket.on('joinFriend', (roomId, callback) => {
-        let index = vacantPrivateRooms.indexOf(roomId);
-        if (index !== -1) {
-            if (rooms[roomId] && rooms[roomId][0] != socket.id) {
-                rooms[roomId].push(socket.id);
-                vacantPrivateRooms.splice(index, 1);
-                fullPrivateRooms.push(roomId);
-                socket.join(roomId);
-                sockets[socket.id] = roomId;
-                startGame(roomId)
-                callback(0);
-            } else {
+        if (room && room.id === roomId) {
+            if (room.privacy === 0 || room.privacy === 1) {
+                callback(2);
+            } else if (room.privacy === 2 || room.privacy === 3) {
                 callback(1);
-            }
-        } else {
-            let r = sockets[socket.id]
-            if (r == roomId) {
-                index = fullPrivateRooms.indexOf(roomId);
-                if (index !== -1) {
-                    callback(1);
-                } else {
-                    callback(2);
-                }
             } else {
+                console.log("This should not happen.");
                 callback(3);
             }
-
+        } else if (rooms[roomId] && rooms[roomId].privacy === 2) {
+            room = rooms[roomId];
+            room.user2 = user;
+            room.setPrivacy(3);
+            user.roomid = roomId;
+            socket.join(room.id);
+            callback(0);
+            startGame(room.id);
+        } else {
+            callback(3);
         }
     });
 
-    function leave(socket) {
-        let r = sockets[socket.id];
-        endGame(r);
-        if (!rooms[r]) {
-            delete sockets[socket.id];
-            return
+    function leave() {
+        if (!user.roomid) {
+            return;
         }
-        // if first user remove, if not it MUST be second user of that room so remove that
-        if (rooms[r][0] === socket.id) {
-            rooms[r].splice(0, 1);
+        socket.leave(room.id);
+        endGame(user.roomid);
+        user.roomid = null;
+        if (room.user1.id === user.id) {
+            room.user1 = room.user2;
+        }
+        room.user2 = null;
+        if (room.privacy === 0) {
+            delete rooms[room.id];
+            Room.deleteRoom(room);
+        } else if (room.privacy === 1) {
+            room.setPrivacy(0);
+        } else if (room.privacy === 2) {
+            Room.deleteRoom(room);
+            delete rooms[room.id];
+        } else if (room.privacy === 3) {
+            room.setPrivacy(2);
         } else {
-            rooms[r].splice(1, 1);
+            console.log("Not an option.");
         }
-
-        if (rooms[r].length === 0) {
-            delete rooms[r];
-            let index = vacantPrivateRooms.indexOf(r);
-            if (index !== -1) {
-                vacantPrivateRooms.splice(index, 1);
-            } else {
-                index = vacantRooms.indexOf(r);
-                vacantRooms.splice(index, 1);
-            }
-        } else {
-            let index = fullPrivateRooms.indexOf(r);
-            if (index !== -1) {
-                fullPrivateRooms.splice(index, 1);
-                vacantPrivateRooms.push(r);
-            } else {
-                index = vacantRooms.indexOf(r);
-                fullRooms.splice(index, 1);
-                vacantRooms.push(r)
-            }
-        }
+        room = null;
     }
 
     socket.on('leaveRoom', (callback) => {
-        leave(socket)
-        socket.leave(sockets[socket.id]);
-        sockets[socket.id] = null;
-        callback(0);
+        leave()
+        // sockets[socket.id] = null;
+        // callback(0);
     });
 
     socket.on('disconnect', () => {
         console.log(socket.id, 'disconnected');
-        //remove from users list
-        const index = users.indexOf(socket.id);
-        if (index !== -1) {
-            users.splice(index, 1);
-        }
-        leave(socket)
-        delete sockets[socket.id];
+        leave()
+        users.delete(user);
     });
 
 

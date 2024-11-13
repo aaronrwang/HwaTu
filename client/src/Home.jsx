@@ -8,7 +8,6 @@ import Header from './Header.jsx';
 const Home = () => {
     const [roomId, setRoomId] = useState('');
     const navigate = useNavigate();
-
     const callback = (id) => {
         setRoomId(id);
         navigate(`/game/${id}`);
