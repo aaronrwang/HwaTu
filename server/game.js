@@ -63,20 +63,18 @@ const cards = [
 
 export class Game {
     constructor(room) {
-        this.deck = []
-        this.p1 = []
-        this.p2 = []
-        this.middle = []
-        this.p1stock = []
-        this.p2stock = []
-        this.user1 = room.user1
-        this.user2 = room.user2
+        console.log("Game was made");
+        this.deck = Array.from({ length: 48 }, (_, i) => (i + 1));
+        this.hand = [[], []];
+        this.stock = [[], []];
+        this.middle = Array.from({ length: 12 }, () => []);
+        this.dealCards();
+        this.user1 = room.user1;
+        this.user2 = room.user2;
+        this.active = 0;
     }
 
     dealCards() {
-        // create deck
-        this.deck = Array.from({ length: 48 }, (_, i) => (i + 1));
-
         // shuffle deck
         for (let i = 0; i < 100; i++) {
             let rand = Math.floor(Math.random() * 49)
@@ -86,19 +84,15 @@ export class Game {
 
         // deal middle
         for (let i = 0; i < 8; i++) {
-            this.middle.push(this.deck.shift())
+            let temp = this.deck.shift()
+            let tempIndex = (temp - 1) % 4;
+            this.middle[tempIndex].push(temp)
         }
 
-        // deal p1
-        for (let i = 0; i < 8; i++) {
-            this.p1.push(this.deck.shift())
+        // deal p1 and p2
+        for (let i = 0; i < 10; i++) {
+            this.hand[0].push(this.deck.shift())
+            this.hand[1].push(this.deck.shift())
         }
-
-        // deal p2
-        for (let i = 0; i < 8; i++) {
-            this.p2.push(this.deck.shift())
-        }
-
-
     }
 }

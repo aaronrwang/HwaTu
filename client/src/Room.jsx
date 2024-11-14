@@ -15,6 +15,9 @@ const Room = () => {
     const { roomId } = useParams();
     const [priv, setPrivate] = useState(false);
     const [pub, setPublic] = useState(false);
+    const [data, setData] = useState({ deck: [], hand: [[], []], middle: [], stock: [] });
+    const [player, setPlayer] = useState(undefined);
+    const [activeCards, setActiveCards] = useState([0, 0]);
 
     // 0: Perfectly executed
     // 1: already connected (waiting for friend)
@@ -33,20 +36,23 @@ const Room = () => {
     useEffect(() => {
         socket.emit('joinFriend', roomId, callback);
 
-        socket.on('message', (message) => {
-            setMessages((prevMessages) => [...prevMessages, message]);
-        });
-        socket.on('startGame', () => {
+        socket.on('startGame', (user1, d) => {
             startGame(true);
+            setPlayer(socket.id === user1 ? 0 : 1);
+            setData(d);
+        });
+        socket.on('data', (d) => {
+            console.log(d);
+            setData(d);
         });
         socket.on('endGame', () => {
             startGame(false);
-            setMessages([]);
         });
 
         return () => {
-            socket.off('message');
             socket.off('startGame'); // Cleanup
+            socket.off('data'); // Cleanup
+            socket.off('endGame'); // Cleanup
         };
     }, [roomId]);
 
@@ -66,7 +72,7 @@ const Room = () => {
             {game && <><div className='game-screen'>
                 <div className="game-main">
                     <div className="p1">
-                        {Array.from({ length: 1 }, (_, index) => (
+                        {Array.from({ length: (data.hand[player]).length }, (_, index) => (
                             <div className="card" key={index + 1}>
                                 <div className="card-inner flip-it">
                                     <div className="card-back">
@@ -80,9 +86,7 @@ const Room = () => {
                         <div className="piles">
                             {Array.from({ length: 12 }, (_, index) => (
                                 <div className="pile" id={`pile-${index}`} key={index + 1}>
-                                    {Array.from({ length: 4 }, (_, index2) => (
-                                        <Card key={`${index * 4 + index2 + 1}`} cardId={`${index * 4 + index2 + 1}`} />
-                                    ))}
+                                    {(data.middle[index]).map((card) => (<Card key={card} cardId={card} clickable={data.active === player} />))}
                                 </div>
                             ))}
                         </div>
@@ -97,13 +101,11 @@ const Room = () => {
                         </div>
                     </div>
                     <div className="p2">
-                        {Array.from({ length: 10 }, (_, index) => (
-                            <Card key={index + 1} cardId={index + 1} clickable={true} />
-                        ))}
+                        {(data.hand[player]).map((card) => (<Card key={card} cardId={card} clickable={data.active === player} />))}
                     </div>
                 </div>
                 <Sidebar roomId={roomId} />
-            </div><div className="mobile">Not Mobile Compatible</div></>}
+            </div><div className="mobile">{player}</div></>}
         </div>
     );
 };

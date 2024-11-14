@@ -45,7 +45,6 @@ class User {
         this.roomid = roomid;
     }
 }
-
 class Room {
 
     // 0:stranger vacant; 1: stranger full; 2: friend vacant; 3: friend full
@@ -56,7 +55,7 @@ class Room {
         this.user1 = user1;
         this.user2 = user2;
         this.privacy = privacy;
-        this.game = new Game('0');
+        this.game = new Game(this);
         this.setPrivacy(privacy);
     }
 
@@ -110,10 +109,11 @@ io.on('connection', (socket) => {
         io.to(room.id).emit('users', [room.user1, room.user2]);
     }
 
-    function startGame(room) {  // Default delay is 1000 ms (1 second)
+    function startGame() {  // Default delay is 1000 ms (1 second)
         setTimeout(() => {
-            io.to(room).emit("startGame");
-            sendUsers()
+            io.to(room.id).emit("startGame", room.user1.id, room.game);
+            sendUsers();
+            sendData();
         }, 1000);
     }
 
@@ -205,6 +205,13 @@ io.on('connection', (socket) => {
         leave()
         users.delete(user);
     });
+
+    socket.on('move', () => {
+        console.log('1');
+    });
+    function sendData() {
+        io.to(room.id).emit("data", room.game);
+    }
 
 
 });

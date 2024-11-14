@@ -85,7 +85,7 @@
 
                     // Add game
                     const gameItem = document.createElement('li');
-                    gameItem.textContent = `Game: ${room.game ? room.game.str : 'None'}`;
+                    gameItem.textContent = `Game: ${room.game ? room.game : 'None'}`;
                     roomDetails.appendChild(gameItem);
 
                     // Append the nested <ul> to the main <li>
