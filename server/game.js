@@ -85,7 +85,7 @@ export class Game {
         // deal middle
         for (let i = 0; i < 8; i++) {
             let temp = this.deck.shift()
-            let tempIndex = (temp - 1) % 4;
+            let tempIndex = Math.floor((temp - 1) / 4);
             this.middle[tempIndex].push(temp)
         }
 

@@ -55,7 +55,7 @@ class Room {
         this.user1 = user1;
         this.user2 = user2;
         this.privacy = privacy;
-        this.game = new Game(this);
+        this.game = undefined;
         this.setPrivacy(privacy);
     }
 
@@ -111,6 +111,7 @@ io.on('connection', (socket) => {
 
     function startGame() {  // Default delay is 1000 ms (1 second)
         setTimeout(() => {
+            room.game = new Game(room);
             io.to(room.id).emit("startGame", room.user1.id, room.game);
             sendUsers();
             sendData();
@@ -206,8 +207,12 @@ io.on('connection', (socket) => {
         users.delete(user);
     });
 
-    socket.on('move', () => {
+    socket.on('move', (activeCards) => {
         console.log('1');
+        // flip top card
+        // determine what happens
+        // change turns
+        // send new data file
     });
     function sendData() {
         io.to(room.id).emit("data", room.game);
