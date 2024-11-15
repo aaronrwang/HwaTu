@@ -73,8 +73,8 @@ export class Game {
         this.user2 = room.user2;
         this.active = 0;
         this.part2 = 0;
-        this.activeCards = [];
-        this.passiveCards = [];
+        this.activeCard = 0;
+        this.passiveCard = 0;
     }
 
     getPile(card) {
@@ -107,76 +107,82 @@ export class Game {
         let pile = this.getPile(activeCard);
         console.log(pile)
         let l = (this.middle[pile]).length;
+        let index = this.hand[this.active].indexOf(activeCard);
+        this.hand[this.active].splice(index, 1);
+
+        // only make active card and dont pass option straight up call move2 and then move3?
         if (l == 2) {
-            this.activeCards.push(activeCard);
+            this.activeCard = activeCard;
         } else {
-            this.passiveCards.push(activeCard);
+            this.passiveCards = activeCard;
         }
         // this.moveCard(activeCard, this.hand[this.active], this.middle[pile]);
         // this.active = (this.active + 1) % 2;
     }
 
-    // first pick
-    move2(arg, activeCard) {
-        let pile;
-        let l = (this.middle[pile]).length;
-        if (arg === 2) {
-            pile = this.getPile(this.activeCards[0]);
-        } else {
-            pile = this.getPile(this.passiveCards[0]);
-        }
-        this.part2 = 1;
-        topcard = this.deck[0];
-        topcardpile = this.getPile(topcard);
-        if (topcardpile === pile) {
-            if (l == 0) {
-                movetostock();
-                stealjunk();
-            } else if (l == 1) {
-                movetomiddle();
-            } else if (l == 2) {
-                movetostock();
-            }
-        } else {
-            if (l == 0) {
-                movetomiddle();
-            } else if (l == 1) {
-                movetostock();
-            } else if (l == 2) {
-                movetostock();
-            } else if (l == 3) {
-                movetostock();
-            }
-            l = (this.middle[topcardpile]).length;
-            if (l == 2) {
-                this.activeCards.push(activeCard);
-            } else {
-                this.passiveCards.push(activeCard);
-            }
-        }
-    }
+    // // first pick
+    // move2(arg, activeCard) {
+    //     let pile;
+    //     let l = (this.middle[pile]).length;
+    //     if (arg === 2) {
+    //         pile = this.getPile(this.activeCard);
+    //     } else {
+    //         pile = this.getPile(this.passiveCard);
+    //     }
+    //     this.part2 = 1;
+    //     topcard = this.deck[0];
+    //     topcardpile = this.getPile(topcard);
+    //     if (topcardpile === pile) {
+    //         if (l == 0) {
+    //             movetostock();
+    //             stealjunk();
+    //         } else if (l == 1) {
+    //             movetomiddle();
+    //         } else if (l == 2) {
+    //             movetostock();
+    //         }
+    //     } else {
+    //         if (l == 0) {
+    //             movetomiddle();
+    //         } else if (l == 1) {
+    //             movetostock();
+    //         } else if (l == 2) {
+    //             movetostock();
+    //         } else if (l == 3) {
+    //             movetostock();
+    //         }
+    //         l = (this.middle[topcardpile]).length;
+    //         if (l == 2) {
+    //             this.activeCard = activeCard;
+    //         } else {
+    //             this.passiveCards = activeCard;
+    //         }
+    //     }
+    // }
 
-    // second pick
-    move3(activeCard) {
-        let pile;
-        let l = (this.middle[pile]).length;
-        if (arg === 2) {
-            pile = this.getPile(this.activeCards[0]);
-        } else {
-            pile = this.getPile(this.passiveCards[0]);
-        }
-        this.part2 = 1;
+    // // second pick
+    // move3(activeCard) {
+    //     let pile;
+    //     let l = (this.middle[pile]).length;
+    //     if (arg === 2) {
+    //         pile = this.getPile(this.activeCard);
+    //     } else {
+    //         pile = this.getPile(this.passiveCardsetActivePile(() => Math.floor((data.activeCard - 1) / 4)););
+    //     }
+    //     this.part2 = 0;
 
-        if (l == 0) {
-            movetomiddle();
-        } else if (l == 1) {
-            movetostock();
-        } else if (l == 2) {
-            movetostock();
-        } else if (l == 3) {
-            movetostock();
-        }
-    }
+    //     if (l == 0) {
+    //         movetomiddle();
+    //     } else if (l == 1) {
+    //         movetostock();
+    //     } else if (l == 2) {
+    //         movetostock();
+    //     } else if (l == 3) {
+    //         movetostock();
+    //     }
+    //     this.active = (this.active + 1) % 2;
+    // }
+
     moveCard(card, from, to) {
         console.log(from, to);
         if (from) {

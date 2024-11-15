@@ -28,11 +28,12 @@
     position: fixed;
     left: 20px;
     bottom: 20px;
+    padding: 15px 5px;
     border: solid black 1px;
     border-radius: 10px;
     background-color: white;
     display: flex;
-    width: 300px;
+    width: 100px;
     height: 150px;
     z-index: 3;
 }
@@ -143,6 +144,10 @@
 .pile {
     display: grid;
     grid-template-columns: repeat(4, 15px);
+}
+
+.pile.active-pile {
+    background-color: gold;
 }
 
 .deck {

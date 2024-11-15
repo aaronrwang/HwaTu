@@ -20,7 +20,7 @@ const Card = ({ cardId, hidden = false, mini = false, clickable = false, onClick
 
     return (
         <div className={mini ? 'card-mini' : 'card'} onClick={clickable ? onClick : undefined}>
-            <div className={`card-inner ${clickable ? 'usable' : ''} ${active ? 'active' : ''} ${hidden ? 'flipped' : ''}`}>
+            <div className={`card-inner ${clickable ? 'usable' : ''} ${hidden ? 'flipped' : ''}`}>
                 <div className="card-front">
                     {imagePath ? (
                         <img src={imagePath} alt={`Card ${cardId}`} className="card-img" />

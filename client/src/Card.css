@@ -50,9 +50,6 @@
     transform: translateY(-30px) translateX(-30px);
 }
 
-.card-inner.active {
-    transform: translateY(-30px) translateX(-30px);
-}
 
 .card-mini:hover .card-mini {
     transform: translateZ(3);
