@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import Card from './Card.jsx';
 import socket from './socket';
 
-export default function Sidebar({ roomId }) {
+export default function Sidebar({ roomId, data, player }) {
     const outgoingMessage = useRef();
     const name = useRef();
     const [messages, setMessages] = useState([]);
@@ -48,9 +48,7 @@ export default function Sidebar({ roomId }) {
                     <div className="used-card">
                         {/* Junk, Ribbons, Animals, Brights */}
                         <div className="used-cards">
-                            {Array.from({ length: 10 }, (_, index) => (
-                                <Card key={index + 1} cardId={index + 1} mini={true} />
-                            ))}
+                            {(data.stock[player]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
                         <div className="used-cards">
                             {Array.from({ length: 10 }, (_, index) => (
@@ -75,9 +73,7 @@ export default function Sidebar({ roomId }) {
                     <div className="used-card">
                         {/* Junk, Ribbons, Animals, Brights */}
                         <div className="used-cards">
-                            {Array.from({ length: 10 }, (_, index) => (
-                                <Card key={index + 1} cardId={index + 1} mini={true} />
-                            ))}
+                            {(data.stock[(player + 1) % 2]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
                         <div className="used-cards">
                             {Array.from({ length: 10 }, (_, index) => (

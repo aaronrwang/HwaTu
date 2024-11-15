@@ -217,6 +217,11 @@ io.on('connection', (socket) => {
         room.game.move2(activeCard);
         io.to(room.id).emit("data", room.game);
     });
+    socket.on('move3', (activeCard) => {
+        console.log('3');
+        room.game.move3(activeCard);
+        io.to(room.id).emit("data", room.game);
+    });
     function sendData() {
         io.to(room.id).emit("data", room.game);
     }

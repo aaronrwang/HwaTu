@@ -105,86 +105,107 @@ export class Game {
     // start turn
     move(activeCard) {
         let pile = this.getPile(activeCard);
-        console.log(pile)
+
         let l = (this.middle[pile]).length;
         let index = this.hand[this.active].indexOf(activeCard);
         this.hand[this.active].splice(index, 1);
-
+        this.activeCard = activeCard;
         // only make active card and dont pass option straight up call move2 and then move3?
-        if (l == 2) {
-            this.activeCard = activeCard;
-        } else {
-            this.passiveCards = activeCard;
+        if (l === 0) {
+            this.move2(0);
+        } else if (l === 1) {
+            this.move2(0);
+        } else if (l === 3) {
+            this.move2(0);
         }
+        // if it is 2 they have to choose again
         // this.moveCard(activeCard, this.hand[this.active], this.middle[pile]);
         // this.active = (this.active + 1) % 2;
     }
 
-    // // first pick
-    // move2(arg, activeCard) {
-    //     let pile;
-    //     let l = (this.middle[pile]).length;
-    //     if (arg === 2) {
-    //         pile = this.getPile(this.activeCard);
-    //     } else {
-    //         pile = this.getPile(this.passiveCard);
-    //     }
-    //     this.part2 = 1;
-    //     topcard = this.deck[0];
-    //     topcardpile = this.getPile(topcard);
-    //     if (topcardpile === pile) {
-    //         if (l == 0) {
-    //             movetostock();
-    //             stealjunk();
-    //         } else if (l == 1) {
-    //             movetomiddle();
-    //         } else if (l == 2) {
-    //             movetostock();
-    //         }
-    //     } else {
-    //         if (l == 0) {
-    //             movetomiddle();
-    //         } else if (l == 1) {
-    //             movetostock();
-    //         } else if (l == 2) {
-    //             movetostock();
-    //         } else if (l == 3) {
-    //             movetostock();
-    //         }
-    //         l = (this.middle[topcardpile]).length;
-    //         if (l == 2) {
-    //             this.activeCard = activeCard;
-    //         } else {
-    //             this.passiveCards = activeCard;
-    //         }
-    //     }
-    // }
+    // first pick
+    move2(activeCard) {
+        let pile = this.getPile(this.activeCard);;
+        let l = (this.middle[pile]).length;
+        this.part2 = 1;
+        let topcard = this.deck.shift();
+        let topcardpile = this.getPile(topcard);
+        if (topcardpile === pile) {
+            if (l == 0) {
+                // move card and topcard to stock
+                this.moveCard(this.activeCard, null, this.stock[this.active]);
+                this.moveCard(topcard, null, this.stock[this.active]);
+                //implement
+                // stealjunk();
+            } else if (l == 1) {
+                // move card and top card to middle ppeok
+                this.moveCard(this.activeCard, null, this.middle[pile]);
+                this.moveCard(topcard, null, this.middle[pile]);
+            } else if (l == 2) {
+                // move all 4 to stock
+                this.moveCard(this.activeCard, null, this.stock[this.active]);
+                this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+                this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+                this.moveCard(topcard, null, this.stock[this.active]);
 
-    // // second pick
-    // move3(activeCard) {
-    //     let pile;
-    //     let l = (this.middle[pile]).length;
-    //     if (arg === 2) {
-    //         pile = this.getPile(this.activeCard);
-    //     } else {
-    //         pile = this.getPile(this.passiveCardsetActivePile(() => Math.floor((data.activeCard - 1) / 4)););
-    //     }
-    //     this.part2 = 0;
+            }
+            this.activeCard = 0;
+            this.active = (this.active + 1) % 2;
+            this.part2 = 0;
+            // end turn;
+        } else {
+            // deal with active and then move 3 is for topcard
+            if (l == 0) {
+                // move active to middle
+                this.moveCard(this.activeCard, null, this.middle[pile]);
+            } else if (l == 1) {
+                // move active and middle to stock
+                this.moveCard(this.activeCard, null, this.stock[this.active]);
+                this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+            } else if (l == 2) {
+                // move active and selected card to stock
+                this.moveCard(this.activeCard, null, this.stock[this.active]);
+                this.moveCard(activeCard, this.middle[pile], this.stock[this.active]);
+            } else if (l == 3) {
+                //move all 4 cards to stock
+                this.moveCard(this.activeCard, null, this.stock[this.active]);
+                this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+                this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+                this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+            }
+            l = (this.middle[topcardpile]).length;
+            this.activeCard = topcard;
+            if (l !== 2) {
+                this.move3(0);
+            }
+        }
+    }
 
-    //     if (l == 0) {
-    //         movetomiddle();
-    //     } else if (l == 1) {
-    //         movetostock();
-    //     } else if (l == 2) {
-    //         movetostock();
-    //     } else if (l == 3) {
-    //         movetostock();
-    //     }
-    //     this.active = (this.active + 1) % 2;
-    // }
+    // second pick
+    move3(activeCard) {
+        this.part2 = 0;
+        let pile = this.getPile(this.activeCard);
+        let l = (this.middle[pile]).length;
+
+        if (l == 0) {
+            this.moveCard(this.activeCard, null, this.middle[pile]);
+        } else if (l == 1) {
+            this.moveCard(this.activeCard, null, this.stock[this.active]);
+            this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+        } else if (l == 2) {
+            this.moveCard(this.activeCard, null, this.stock[this.active]);
+            this.moveCard(activeCard, this.middle[pile], this.stock[this.active]);
+        } else if (l == 3) {
+            this.moveCard(this.activeCard, null, this.stock[this.active]);
+            this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+            this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+            this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+        }
+        this.activeCard = 0;
+        this.active = (this.active + 1) % 2;
+    }
 
     moveCard(card, from, to) {
-        console.log(from, to);
         if (from) {
             let index = from.indexOf(card);
             from.splice(index, 1);

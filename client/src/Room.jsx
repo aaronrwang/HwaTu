@@ -40,9 +40,9 @@ const Room = () => {
     function setSecondCard(card) {
         console.log('maybe')
         if (data.part2 === 0) {
-            // socket.emit('move2', card);
+            socket.emit('move2', card);
         } else {
-            // socket.emit('move3', card);  
+            socket.emit('move3', card);
         }
     }
     useEffect(() => {
@@ -107,7 +107,7 @@ const Room = () => {
                                     </div>
                                 ))}
                             </div>
-                            <div className="deck">
+                            {(data.deck).length !== 0 && <div className="deck">
                                 <div className="card">
                                     <div className="card-inner flip-it">
                                         <div className="card-back">
@@ -115,13 +115,13 @@ const Room = () => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div>}
                         </div>
                         <div className="p1">
                             {(data.hand[player]).map((card) => (<Card key={card} cardId={card} clickable={data.active === player} onClick={() => setFirstCard(card)} />))}
                         </div>
                     </div>
-                    <Sidebar roomId={roomId} />
+                    <Sidebar roomId={roomId} data={data} player={player} />
                 </div><div className="mobile">{player}</div></>}
         </div>
     );
