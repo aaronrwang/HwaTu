@@ -72,8 +72,14 @@ export class Game {
         this.user1 = room.user1;
         this.user2 = room.user2;
         this.active = 0;
+        this.part2 = 0;
+        this.activeCards = [];
+        this.passiveCards = [];
     }
 
+    getPile(card) {
+        return Math.floor((card - 1) / 4);
+    }
     dealCards() {
         // shuffle deck
         for (let i = 0; i < 100; i++) {
@@ -94,5 +100,89 @@ export class Game {
             this.hand[0].push(this.deck.shift())
             this.hand[1].push(this.deck.shift())
         }
+    }
+
+    // start turn
+    move(activeCard) {
+        let pile = this.getPile(activeCard);
+        console.log(pile)
+        let l = (this.middle[pile]).length;
+        if (l == 2) {
+            this.activeCards.push(activeCard);
+        } else {
+            this.passiveCards.push(activeCard);
+        }
+        // this.moveCard(activeCard, this.hand[this.active], this.middle[pile]);
+        // this.active = (this.active + 1) % 2;
+    }
+
+    // first pick
+    move2(arg, activeCard) {
+        let pile;
+        let l = (this.middle[pile]).length;
+        if (arg === 2) {
+            pile = this.getPile(this.activeCards[0]);
+        } else {
+            pile = this.getPile(this.passiveCards[0]);
+        }
+        this.part2 = 1;
+        topcard = this.deck[0];
+        topcardpile = this.getPile(topcard);
+        if (topcardpile === pile) {
+            if (l == 0) {
+                movetostock();
+                stealjunk();
+            } else if (l == 1) {
+                movetomiddle();
+            } else if (l == 2) {
+                movetostock();
+            }
+        } else {
+            if (l == 0) {
+                movetomiddle();
+            } else if (l == 1) {
+                movetostock();
+            } else if (l == 2) {
+                movetostock();
+            } else if (l == 3) {
+                movetostock();
+            }
+            l = (this.middle[topcardpile]).length;
+            if (l == 2) {
+                this.activeCards.push(activeCard);
+            } else {
+                this.passiveCards.push(activeCard);
+            }
+        }
+    }
+
+    // second pick
+    move3(activeCard) {
+        let pile;
+        let l = (this.middle[pile]).length;
+        if (arg === 2) {
+            pile = this.getPile(this.activeCards[0]);
+        } else {
+            pile = this.getPile(this.passiveCards[0]);
+        }
+        this.part2 = 1;
+
+        if (l == 0) {
+            movetomiddle();
+        } else if (l == 1) {
+            movetostock();
+        } else if (l == 2) {
+            movetostock();
+        } else if (l == 3) {
+            movetostock();
+        }
+    }
+    moveCard(card, from, to) {
+        console.log(from, to);
+        if (from) {
+            let index = from.indexOf(card);
+            from.splice(index, 1);
+        }
+        to.push(card);
     }
 }

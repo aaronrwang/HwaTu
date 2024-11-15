@@ -17,8 +17,9 @@ const Room = () => {
     const [pub, setPublic] = useState(false);
     const [data, setData] = useState({ deck: [], hand: [[], []], middle: [], stock: [] });
     const [player, setPlayer] = useState(undefined);
-    const [activeCards, setActiveCards] = useState([0, 0]);
+    const [activeCard, setActiveCard] = useState(0);
     const [activePile, setActivePile] = useState(0);
+    const [second, setSecond] = useState(false);
 
     // 0: Perfectly executed
     // 1: already connected (waiting for friend)
@@ -36,21 +37,15 @@ const Room = () => {
     }
     function setFirstCard(card) {
         console.log('yes')
-        if (data.active === player && activeCards[0] === 0) {
-            setActiveCards([card, 0]);
-            let pile = Math.floor((card - 1) / 4)
-            setActivePile(pile);
-            if ((data.middle[pile]).length !== 2) {
-                socket.emit('move', activeCards);
-            }
-        }
+        // setActiveCard(card);
+        socket.emit('move', card);
     }
     function setSecondCard(card) {
         console.log('maybe')
-        if (data.active === player && activeCards[0] !== 0 && activeCards[1] === 0 && Math.floor((card - 1) / 4) === activePile) {
-            setActiveCards((old) => ([old[0], card]));
-            socket.emit('move', activeCards);
+        if (!second) {
+            return;
         }
+        socket.emit('move2', card);
     }
     useEffect(() => {
         socket.emit('joinFriend', roomId, callback);
@@ -88,43 +83,45 @@ const Room = () => {
                 <h1>Waiting for Opponent...</h1>
 
             </div>}
-            {game && <><div className='game-screen'>
-                <div className="game-main">
-                    <div className="p2">
-                        {Array.from({ length: (data.hand[player]).length }, (_, index) => (
-                            <div className="card" key={index + 1}>
-                                <div className="card-inner flip-it">
-                                    <div className="card-back">
-                                        <img src={back} alt="Card Back" className="card-img" />
+            {game && <>
+                {(data.activeCards).length !== 0 && <div className="activeCards" />}
+                <div className='game-screen'>
+                    <div className="game-main">
+                        <div className="p2">
+                            {Array.from({ length: (data.hand[(player + 1) % 2]).length }, (_, index) => (
+                                <div className="card" key={index + 1}>
+                                    <div className="card-inner flip-it">
+                                        <div className="card-back">
+                                            <img src={back} alt="Card Back" className="card-img" />
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="middle">
-                        <div className="piles">
-                            {Array.from({ length: 12 }, (_, index) => (
-                                <div className="pile" id={`pile-${index}`} key={index + 1}>
-                                    {(data.middle[index]).map((card) => (<Card key={card} cardId={card} clickable={data.active === player && activePile === index} onClick={() => setSecondCard(card)} />))}
                                 </div>
                             ))}
                         </div>
-                        <div className="deck">
-                            <div className="card">
-                                <div className="card-inner flip-it">
-                                    <div className="card-back">
-                                        <img src={back} alt="Card Back" className="card-img" />
+                        <div className="middle">
+                            <div className="piles">
+                                {Array.from({ length: 12 }, (_, index) => (
+                                    <div className="pile" id={`pile-${index}`} key={index + 1}>
+                                        {(data.middle[index]).map((card) => (<Card key={card} cardId={card} clickable={data.active === player && activePile === index} onClick={() => setSecondCard(card)} />))}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="deck">
+                                <div className="card">
+                                    <div className="card-inner flip-it">
+                                        <div className="card-back">
+                                            <img src={back} alt="Card Back" className="card-img" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div className="p1">
+                            {(data.hand[player]).map((card) => (<Card key={card} cardId={card} clickable={data.active === player} onClick={() => setFirstCard(card)} active={activeCard === card} />))}
+                        </div>
                     </div>
-                    <div className="p1">
-                        {(data.hand[player]).map((card) => (<Card key={card} cardId={card} clickable={data.active === player} onClick={() => setFirstCard(card)} />))}
-                    </div>
-                </div>
-                <Sidebar roomId={roomId} />
-            </div><div className="mobile">{player}</div></>}
+                    <Sidebar roomId={roomId} />
+                </div><div className="mobile">{player}</div></>}
         </div>
     );
 };

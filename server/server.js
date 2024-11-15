@@ -207,12 +207,15 @@ io.on('connection', (socket) => {
         users.delete(user);
     });
 
-    socket.on('move', (activeCards) => {
+    socket.on('move', (activeCard) => {
         console.log('1');
-        // flip top card
-        // determine what happens
-        // change turns
-        // send new data file
+        room.game.move(activeCard);
+        io.to(room.id).emit("data", room.game);
+    });
+    socket.on('move2', (activeCard) => {
+        console.log('2');
+        room.game.move2(activeCard);
+        io.to(room.id).emit("data", room.game);
     });
     function sendData() {
         io.to(room.id).emit("data", room.game);
