@@ -9,6 +9,8 @@ export default function Sidebar({ roomId, data, player }) {
     const [messages, setMessages] = useState([]);
     const [p1name, setp1name] = useState(socket.id.slice(0, 5));
     const [p2name, setp2name] = useState(undefined);
+    const p1stock = data.stock[player];
+    const p2stock = data.stock[(player + 1) % 2];
     useEffect(() => {
         socket.emit('name', p1name);
         socket.on('message', (id, message) => {
@@ -44,51 +46,49 @@ export default function Sidebar({ roomId, data, player }) {
         <div className="side-bar">
             <div className="stats">
                 <div className="player-stats">
-                    <div>{p1name}:10</div>
+                    <div>{p1name}: {data.scores[player][0]}</div>
                     <div className="used-card">
                         {/* Junk, Ribbons, Animals, Brights */}
                         <div className="used-cards">
-                            {(data.stock[player]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
+                            {(p1stock[0][0]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
+                            {(p1stock[0][1]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
                         <div className="used-cards">
-                            {Array.from({ length: 10 }, (_, index) => (
-                                <Card key={index + 1} cardId={index + 1} mini={true} />
-                            ))}
+                            {(p1stock[1][0]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
+                            {(p1stock[1][1]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
+                            {(p1stock[1][2]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
+                            {(p1stock[1][3]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
                         <div className="used-cards">
-                            {Array.from({ length: 10 }, (_, index) => (
-                                <Card key={index + 1} cardId={index + 1} mini={true} />
-                            ))}
+                            {(p1stock[2][0]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
+                            {(p1stock[2][1]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
                         <div className="used-cards">
-                            {Array.from({ length: 10 }, (_, index) => (
-                                <Card key={index + 1} cardId={index + 1} mini={true} />
-                            ))}
+                            {(p1stock[3]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
 
                     </div>
                 </div>
                 <div className="player-stats">
-                    <div>{p2name}:10</div>
+                    <div>{p2name}: {data.scores[(player + 1) % 2][0]}</div>
                     <div className="used-card">
                         {/* Junk, Ribbons, Animals, Brights */}
                         <div className="used-cards">
-                            {(data.stock[(player + 1) % 2]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
+                            {(p2stock[0][0]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
+                            {(p2stock[0][1]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
                         <div className="used-cards">
-                            {Array.from({ length: 10 }, (_, index) => (
-                                <Card key={index + 1} cardId={index + 1} mini={true} />
-                            ))}
+                            {(p2stock[1][0]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
+                            {(p2stock[1][1]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
+                            {(p2stock[1][2]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
+                            {(p2stock[1][3]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
                         <div className="used-cards">
-                            {Array.from({ length: 10 }, (_, index) => (
-                                <Card key={index + 1} cardId={index + 1} mini={true} />
-                            ))}
+                            {(p2stock[2][0]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
+                            {(p2stock[2][1]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
                         <div className="used-cards">
-                            {Array.from({ length: 10 }, (_, index) => (
-                                <Card key={index + 1} cardId={index + 1} mini={true} />
-                            ))}
+                            {(p2stock[3]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
 
                     </div>

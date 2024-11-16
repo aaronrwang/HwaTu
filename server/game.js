@@ -60,14 +60,16 @@ const cards = [
     { id: 48, type: 1, special: 'ssangpi' },
 ];
 
+// rewrite stocks like how i did for the other one. Display them all by one.
 
 export class Game {
     constructor(room) {
         console.log("Game was made");
         this.deck = Array.from({ length: 48 }, (_, i) => (i + 1));
         this.hand = [[], []];
-        this.stock = [[], []];
+        this.stock = [[[[], []], [[], [], [], []], [[], []], []], [[[], []], [[], [], [], []], [[], []], []]];
         this.middle = Array.from({ length: 12 }, () => []);
+        this.scores = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]];
         this.dealCards();
         this.user1 = room.user1;
         this.user2 = room.user2;
@@ -80,6 +82,41 @@ export class Game {
     getPile(card) {
         return Math.floor((card - 1) / 4);
     }
+
+    getStockPile(card) {
+        const type = cards[card - 1].type - 1;
+        const special = cards[card - 1].special;
+        const stock = this.stock[this.active]
+        if (type === 0) {
+            if (special == 'ssangpi') {
+                return stock[type][1]
+            } else {
+                return stock[type][0]
+            }
+        } else if (type === 1) {
+            if (special == 'hongdan') {
+                return stock[type][0];
+            } else if (special == 'chodan') {
+                return stock[type][1];
+            } else if (special == 'cheongdan') {
+                return stock[type][2];
+            } else if (special == 'december') {
+                return stock[type][3];
+            } else {
+                alert("ERROR RIBBON TYPE")
+            }
+        } else if (type === 2) {
+            if (special == 'godori') {
+                return stock[type][1];
+            } else {
+                return stock[type][0];
+            }
+        } else if (type === 3) {
+            return stock[type];
+        }
+        alert('error');
+    }
+
     dealCards() {
         // shuffle deck
         for (let i = 0; i < 100; i++) {
@@ -119,8 +156,6 @@ export class Game {
             this.move2(0);
         }
         // if it is 2 they have to choose again
-        // this.moveCard(activeCard, this.hand[this.active], this.middle[pile]);
-        // this.active = (this.active + 1) % 2;
     }
 
     // first pick
@@ -133,8 +168,8 @@ export class Game {
         if (topcardpile === pile) {
             if (l == 0) {
                 // move card and topcard to stock
-                this.moveCard(this.activeCard, null, this.stock[this.active]);
-                this.moveCard(topcard, null, this.stock[this.active]);
+                this.moveCard(this.activeCard, null, this.getStockPile(this.activeCard));
+                this.moveCard(topcard, null, this.getStockPile(topcard));
                 //implement
                 // stealjunk();
             } else if (l == 1) {
@@ -143,15 +178,16 @@ export class Game {
                 this.moveCard(topcard, null, this.middle[pile]);
             } else if (l == 2) {
                 // move all 4 to stock
-                this.moveCard(this.activeCard, null, this.stock[this.active]);
-                this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
-                this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
-                this.moveCard(topcard, null, this.stock[this.active]);
+                this.moveCard(this.activeCard, null, this.getStockPile(this.activeCard));
+                this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
+                this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
+                this.moveCard(topcard, null, this.getStockPile(topcard));
 
             }
             this.activeCard = 0;
             this.active = (this.active + 1) % 2;
             this.part2 = 0;
+            this.calculateScore();
             // end turn;
         } else {
             // deal with active and then move 3 is for topcard
@@ -160,18 +196,18 @@ export class Game {
                 this.moveCard(this.activeCard, null, this.middle[pile]);
             } else if (l == 1) {
                 // move active and middle to stock
-                this.moveCard(this.activeCard, null, this.stock[this.active]);
-                this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+                this.moveCard(this.activeCard, null, this.getStockPile(this.activeCard));
+                this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
             } else if (l == 2) {
                 // move active and selected card to stock
-                this.moveCard(this.activeCard, null, this.stock[this.active]);
-                this.moveCard(activeCard, this.middle[pile], this.stock[this.active]);
+                this.moveCard(this.activeCard, null, this.getStockPile(this.activeCard));
+                this.moveCard(activeCard, this.middle[pile], this.getStockPile(activeCard));
             } else if (l == 3) {
                 //move all 4 cards to stock
-                this.moveCard(this.activeCard, null, this.stock[this.active]);
-                this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
-                this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
-                this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+                this.moveCard(this.activeCard, null, this.getStockPile(this.activeCard));
+                this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
+                this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
+                this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
             }
             l = (this.middle[topcardpile]).length;
             this.activeCard = topcard;
@@ -190,19 +226,20 @@ export class Game {
         if (l == 0) {
             this.moveCard(this.activeCard, null, this.middle[pile]);
         } else if (l == 1) {
-            this.moveCard(this.activeCard, null, this.stock[this.active]);
-            this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+            this.moveCard(this.activeCard, null, this.getStockPile(this.activeCard));
+            this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
         } else if (l == 2) {
-            this.moveCard(this.activeCard, null, this.stock[this.active]);
-            this.moveCard(activeCard, this.middle[pile], this.stock[this.active]);
+            this.moveCard(this.activeCard, null, this.getStockPile(this.activeCard));
+            this.moveCard(activeCard, this.middle[pile], this.getStockPile(activeCard));
         } else if (l == 3) {
-            this.moveCard(this.activeCard, null, this.stock[this.active]);
-            this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
-            this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
-            this.moveCard(this.middle[pile][0], this.middle[pile], this.stock[this.active]);
+            this.moveCard(this.activeCard, null, this.getStockPile(this.activeCard));
+            this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
+            this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
+            this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
         }
         this.activeCard = 0;
         this.active = (this.active + 1) % 2;
+        this.calculateScore();
     }
 
     moveCard(card, from, to) {
@@ -211,5 +248,63 @@ export class Game {
             from.splice(index, 1);
         }
         to.push(card);
+    }
+
+    calculateScore() {
+        const scores = this.scores;
+        const tabledCards = this.stock;
+        for (let i = 0; i < 2; i++) {
+
+            //for junk one; double junk two; need 10 for first point
+            scores[i][1] = 0
+            scores[i][1] += tabledCards[i][0][0].length
+            scores[i][1] += tabledCards[i][0][1].length * 2
+            scores[i][1] -= 9
+            if (scores[i][1] < 0) {
+                scores[i][1] = 0
+            }
+
+            //for ribbon Five = 1 points +1 up to 5 for 9 and 3 sets for 3 points
+            scores[i][2] = -4
+            let sets = 0;
+            tabledCards[i][1].forEach((set) => {
+                let setLength = set.length
+                scores[i][2] += setLength
+                if (setLength == 3) {
+                    sets++;
+                }
+            })
+
+            if (scores[i][2] < 0) {
+                scores[i][2] = 0
+            }
+            scores[i][2] += sets * 3
+
+            //for animals Five = 1 points +1 up to 5 for 9 and 1 set for 5 points
+            scores[i][3] = tabledCards[i][2][0].length + tabledCards[i][2][1].length - 4
+            if (scores[i][3] < 0) {
+                scores[i][3] = 0
+            }
+            if (tabledCards[i][2][1].length == 3) {
+                scores[i][3] += 5
+            }
+
+            //for brights if 3 and decemebr 2, if 3 no december 3, if 4 then 4, if 5 then 15
+            let brightCount = tabledCards[i][3].length
+            if (brightCount == 3) {
+                scores[i][4] = 3
+                tabledCards[i][3].forEach((card) => {
+                    if (cardObjectDefinitions[card.id - 1].special == 'december') {
+                        scores[i][4]--
+                    }
+                })
+            } else if (brightCount == 4) {
+                scores[i][4] = 4
+            } else if (brightCount == 5) {
+                scores[i][4] == 15
+            }
+            //total score is all added together
+            scores[i][0] = scores[i][1] + scores[i][2] + scores[i][3] + scores[i][4]
+        }
     }
 }
