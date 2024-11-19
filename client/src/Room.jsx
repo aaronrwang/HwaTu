@@ -9,7 +9,7 @@ import back from './assets/Cards/000.png';
 import Sidebar from './Sidebar.jsx';
 
 const Room = () => {
-    const domain = "http://localhost:5173";
+    const domain = "https://hwatu-gostop-github-io.onrender.com/";
     const navigate = useNavigate();
     const [game, startGame] = useState(false);
     const { roomId } = useParams();
