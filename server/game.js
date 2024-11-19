@@ -170,8 +170,7 @@ export class Game {
                 // move card and topcard to stock
                 this.moveCard(this.activeCard, null, this.getStockPile(this.activeCard));
                 this.moveCard(topcard, null, this.getStockPile(topcard));
-                //implement
-                // stealjunk();
+                this.stealJunk();
             } else if (l == 1) {
                 // move card and top card to middle ppeok
                 this.moveCard(this.activeCard, null, this.middle[pile]);
@@ -182,12 +181,12 @@ export class Game {
                 this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
                 this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
                 this.moveCard(topcard, null, this.getStockPile(topcard));
+                this.stealJunk();
 
             }
             this.activeCard = 0;
             this.active = (this.active + 1) % 2;
             this.part2 = 0;
-            this.calculateScore();
             // end turn;
         } else {
             // deal with active and then move 3 is for topcard
@@ -239,7 +238,6 @@ export class Game {
         }
         this.activeCard = 0;
         this.active = (this.active + 1) % 2;
-        this.calculateScore();
     }
 
     moveCard(card, from, to) {
@@ -248,6 +246,12 @@ export class Game {
             from.splice(index, 1);
         }
         to.push(card);
+    }
+    stealJunk() {
+        const opp = (this.active + 1) % 2
+        if ((this.stock[opp][0][0]).length !== 0) {
+            this.moveCard(this.stock[opp][0][0][0], this.stock[opp][0][0], this.stock[this.active][0][0])
+        }
     }
 
     calculateScore() {
@@ -294,7 +298,7 @@ export class Game {
             if (brightCount == 3) {
                 scores[i][4] = 3
                 tabledCards[i][3].forEach((card) => {
-                    if (cardObjectDefinitions[card.id - 1].special == 'december') {
+                    if (card.special == 'december') {
                         scores[i][4]--
                     }
                 })
@@ -306,5 +310,11 @@ export class Game {
             //total score is all added together
             scores[i][0] = scores[i][1] + scores[i][2] + scores[i][3] + scores[i][4]
         }
+        if (scores[0][0] >= 7) {
+            return 0
+        } else if (scores[1][0] >= 7) {
+            return 1;
+        }
+        return -1;
     }
 }

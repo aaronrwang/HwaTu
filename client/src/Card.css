@@ -6,6 +6,7 @@
     perspective: 1000px;
     cursor: pointer;
     z-index: 0;
+    transition: opacity 2s ease-in;
 }
 
 .card-mini {
@@ -22,6 +23,7 @@
     height: 100%;
     text-align: center;
     transition: transform 0.6s;
+    /* transition: z-index 0s ease 0.3s; */
     transform-style: preserve-3d;
     /* border-radius: 10px; */
 }
@@ -51,8 +53,8 @@
 }
 
 
-.card-mini:hover .card-mini {
-    transform: translateZ(3);
+.card-mini:hover .card-inner {
+    transform: translateY(30px) translateX(30px);
 }
 
 /* .card-inner.usable {

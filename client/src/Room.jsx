@@ -16,8 +16,10 @@ const Room = () => {
     const [priv, setPrivate] = useState(false);
     const [pub, setPublic] = useState(false);
     const [data, setData] = useState({ deck: [], hand: [[], []], middle: [], stock: [] });
-    const [player, setPlayer] = useState(undefined);
+    const playerRef = useRef(null);  // Track player without re-rendering
     const [activePile, setActivePile] = useState(-1);
+    const [display, setDisplay] = useState(null)
+    console.log("test", playerRef.current);
     // 0: Perfectly executed
     // 1: already connected (waiting for friend)
     // 2: already connected (waiting for stranger)
@@ -47,10 +49,13 @@ const Room = () => {
     }
     useEffect(() => {
         socket.emit('joinFriend', roomId, callback);
-
+        socket.on('leave', () => {
+            console.log('leave')
+            navigate(`/`);
+        });
         socket.on('startGame', (user1, d) => {
             startGame(true);
-            setPlayer(socket.id === user1 ? 0 : 1);
+            playerRef.current = (socket.id === user1 ? 0 : 1);
             setData(d);
         });
         socket.on('data', (d) => {
@@ -61,17 +66,37 @@ const Room = () => {
         socket.on('endGame', () => {
             startGame(false);
         });
+        socket.on('winner', (winner) => {
+            console.log('won', typeof winner, winner);
+            console.log('player', typeof playerRef.current, playerRef.current);
+
+            if (winner === playerRef.current) {
+                setDisplay('winner');
+            } else if (winner === (playerRef.current + 1) % 2) {
+                setDisplay('loser');
+            }
+        })
 
         return () => {
             socket.off('startGame'); // Cleanup
             socket.off('data'); // Cleanup
             socket.off('endGame'); // Cleanup
+            socket.off('winner'); // Cleanup
+            socket.off('leave'); // Cleanup
         };
     }, [roomId]);
 
     return (
         <div className='room'>
             <Header page={`Room: ${roomId}`} />
+            {display && display === 'winner' && <div className='waiting-screen'>
+                <h1>You Won</h1>
+
+            </div>}
+            {display && display === 'loser' && <div className='waiting-screen'>
+                <h1>You Lost</h1>
+
+            </div>}
 
             {!game && priv && <div className='waiting-screen'>
                 <h1>Waiting for friend...</h1>
@@ -82,14 +107,14 @@ const Room = () => {
                 <h1>Waiting for Opponent...</h1>
 
             </div>}
-            {game && <>
-                {data.activeCard !== 0 && data.active === player && <div className="activeCards">
+            {game && !display && <>
+                {data.activeCard !== 0 && data.active === playerRef.current && <div className="activeCards">
                     <Card key={data.activeCard} cardId={data.activeCard} />
                 </div>}
                 <div className='game-screen'>
                     <div className="game-main">
                         <div className="p2">
-                            {Array.from({ length: (data.hand[(player + 1) % 2]).length }, (_, index) => (
+                            {Array.from({ length: (data.hand[(playerRef.current + 1) % 2]).length }, (_, index) => (
                                 <div className="card" key={index + 1}>
                                     <div className="card-inner flip-it">
                                         <div className="card-back">
@@ -102,8 +127,8 @@ const Room = () => {
                         <div className="middle">
                             <div className="piles">
                                 {Array.from({ length: 12 }, (_, index) => (
-                                    <div className={`pile ${activePile === index ? 'active-pile' : ''}`} id={`pile-${index}`} key={index + 1}>
-                                        {(data.middle[index]).map((card) => (<Card key={card} cardId={card} clickable={data.active === player && activePile === index} onClick={() => setSecondCard(card)} />))}
+                                    <div className={`pile ${activePile === index && playerRef.current === data.active ? 'active-pile' : ''}`} id={`pile-${index}`} key={index + 1}>
+                                        {(data.middle[index]).map((card) => (<Card key={card} cardId={card} clickable={data.active === playerRef.current && activePile === index} onClick={() => setSecondCard(card)} />))}
                                     </div>
                                 ))}
                             </div>
@@ -118,11 +143,11 @@ const Room = () => {
                             </div>}
                         </div>
                         <div className="p1">
-                            {(data.hand[player]).map((card) => (<Card key={card} cardId={card} clickable={data.active === player} onClick={() => setFirstCard(card)} />))}
+                            {(data.hand[playerRef.current]).map((card) => (<Card key={card} cardId={card} clickable={data.active === playerRef.current} onClick={() => setFirstCard(card)} />))}
                         </div>
                     </div>
-                    <Sidebar roomId={roomId} data={data} player={player} />
-                </div><div className="mobile">{player}</div></>}
+                    <Sidebar roomId={roomId} data={data} player={playerRef.current} />
+                </div><div className="mobile">{playerRef.current}</div></>}
         </div>
     );
 };

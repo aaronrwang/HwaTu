@@ -206,20 +206,34 @@ io.on('connection', (socket) => {
         leave()
         users.delete(user);
     });
+    function calculateScore() {
+        const winner = room.game.calculateScore();
+        if (winner === 0) {
+            completeGame(0);
+        } else if (winner === 1) {
+            completeGame(1)
+        }
+    }
+    function completeGame(winner) {
+        io.to(room.id).emit('winner', winner);
+        setTimeout(() => {
+            io.to(room.id).emit('leave');
+        }, 3000);
 
+    }
     socket.on('move', (activeCard) => {
-        console.log('1');
         room.game.move(activeCard);
+        calculateScore();
         io.to(room.id).emit("data", room.game);
     });
     socket.on('move2', (activeCard) => {
-        console.log('2');
         room.game.move2(activeCard);
+        calculateScore();
         io.to(room.id).emit("data", room.game);
     });
     socket.on('move3', (activeCard) => {
-        console.log('3');
         room.game.move3(activeCard);
+        calculateScore();
         io.to(room.id).emit("data", room.game);
     });
     function sendData() {
