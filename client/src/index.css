@@ -31,11 +31,6 @@ body {
   height: 100vh;
 }
 
-#root {
-  width: 100vw;
-  height: 100vh;
-}
-
 /* Reset margins and padding */
 * {
   margin: 0;
@@ -68,18 +63,3 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 } */
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-
-  a:hover {
-    color: #747bff;
-  }
-
-  button {
-    background-color: #f9f9f9;
-  }
-}

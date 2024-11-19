@@ -15,7 +15,8 @@ export default function Header({ page }) {
             <dialog className="result-modal" open>
                 <h2>Hwatu (Go-Stop)</h2>
                 <p>These are the directions</p>
-                <p><a href="https://en.wikipedia.org/wiki/Go-Stop">Wiki Directions</a></p>
+                <p>This version is 2 player and stops at 7 points.</p>
+                <p><a href="https://en.wikipedia.org/wiki/Go-Stop" target="_blank">Wiki Directions</a></p>
                 <button onClick={closeDirections}>Close</button>
             </dialog>
         </div>
