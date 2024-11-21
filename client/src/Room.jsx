@@ -5,7 +5,7 @@ import socket from './socket';
 import Gamelink from './Gamelink.jsx';
 import Header from './Header.jsx';
 import Card from './Card.jsx';
-import back from './assets/Cards/000.png';
+import back from './assets/Cards/000.jpg';
 import Sidebar from './Sidebar.jsx';
 
 const Room = () => {
@@ -100,7 +100,7 @@ const Room = () => {
 
             {!game && priv && <div className='waiting-screen'>
                 <h1>Waiting for friend...</h1>
-                <Gamelink link={domain + '/game/' + roomId} />
+                <Gamelink link={domain + '#/game/' + roomId} />
 
             </div>}
             {!game && pub && <div className='waiting-screen'>
@@ -110,6 +110,9 @@ const Room = () => {
             {game && !display && <>
                 {data.activeCard !== 0 && data.active === playerRef.current && <div className="activeCards">
                     <Card key={data.activeCard} cardId={data.activeCard} />
+                </div>}
+                {data.active === playerRef.current && <div className="turn-indicator">
+                    <h2>Your Turn</h2>
                 </div>}
                 <div className='game-screen'>
                     <div className="game-main">

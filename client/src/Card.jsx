@@ -2,7 +2,7 @@
 import './Card.css';
 import React, { useEffect, useState } from 'react';
 import { getImageById } from './cardimg.js'; // Import the function to get the image by id
-import back from './assets/Cards/000.png';
+import back from './assets/Cards/000.jpg';
 
 const Card = ({ cardId, hidden = false, mini = false, clickable = false, onClick = undefined, active = false }) => {
     const [imagePath, setImagePath] = useState(null); // State to store the front image path

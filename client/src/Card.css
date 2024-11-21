@@ -1,5 +1,5 @@
 .card {
-    --card-width: 90px;
+    --card-width: 80px;
     --card-height: 120px;
     height: var(--card-height);
     width: var(--card-width);
@@ -10,7 +10,7 @@
 }
 
 .card-mini {
-    width: 45px;
+    width: 40px;
     height: 60px;
     perspective: 1000px;
     cursor: pointer;

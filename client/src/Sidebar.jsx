@@ -49,20 +49,24 @@ export default function Sidebar({ roomId, data, player }) {
                     <div>{p1name}: {data.scores[player][0]}</div>
                     <div className="used-card">
                         {/* Junk, Ribbons, Animals, Brights */}
+                        <p className="used-card-header">Junk: {data.scores[player][1]}</p>
                         <div className="used-cards">
                             {(p1stock[0][0]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                             {(p1stock[0][1]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
+                        <p className="used-card-header">Ribbons: {data.scores[player][2]}</p>
                         <div className="used-cards">
                             {(p1stock[1][0]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                             {(p1stock[1][1]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                             {(p1stock[1][2]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                             {(p1stock[1][3]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
+                        <p className="used-card-header">Animals: {data.scores[player][3]}</p>
                         <div className="used-cards">
                             {(p1stock[2][0]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                             {(p1stock[2][1]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
+                        <p className="used-card-header">Brights: {data.scores[player][4]}</p>
                         <div className="used-cards">
                             {(p1stock[3]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
@@ -73,20 +77,24 @@ export default function Sidebar({ roomId, data, player }) {
                     <div>{p2name}: {data.scores[(player + 1) % 2][0]}</div>
                     <div className="used-card">
                         {/* Junk, Ribbons, Animals, Brights */}
+                        <p className="used-card-header">Junk: {data.scores[(player + 1) % 2][1]}</p>
                         <div className="used-cards">
                             {(p2stock[0][0]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                             {(p2stock[0][1]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
+                        <p className="used-card-header">Ribbons: {data.scores[(player + 1) % 2][2]}</p>
                         <div className="used-cards">
                             {(p2stock[1][0]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                             {(p2stock[1][1]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                             {(p2stock[1][2]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                             {(p2stock[1][3]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
+                        <p className="used-card-header">Animals: {data.scores[(player + 1) % 2][3]}</p>
                         <div className="used-cards">
                             {(p2stock[2][0]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                             {(p2stock[2][1]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
+                        <p className="used-card-header">Brights: {data.scores[(player + 1) % 2][4]}</p>
                         <div className="used-cards">
                             {(p2stock[3]).map((card) => (<Card key={card} cardId={card} mini={true} />))}
                         </div>
@@ -97,15 +105,17 @@ export default function Sidebar({ roomId, data, player }) {
             </div>
 
             <div className="chat">
-                <div>
-                    <input type='text' ref={name}></input>
-                    <button onClick={sendName}>Change Name</button>
-                </div>
-                <div>
-                    <input type='text' ref={outgoingMessage}></input>
-                    <button onClick={sendMessage}>Send Message</button>
-                </div>
                 <ul>{messages.map((msg, index) => (<li key={index}>{msg[0] === socket.id ? p1name : p2name}: {msg[1]}</li>))}</ul>
+                <div className="chat-options">
+                    <div>
+                        <input type='text' ref={name}></input>
+                        <button onClick={sendName}>Change Name</button>
+                    </div>
+                    <div>
+                        <input type='text' ref={outgoingMessage}></input>
+                        <button onClick={sendMessage}>Send Message</button>
+                    </div>
+                </div>
             </div>
         </div>
     );

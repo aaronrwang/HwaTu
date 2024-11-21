@@ -1,8 +1,7 @@
 // src/App.js
 import './App.css';
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { HashRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Home from './Home.jsx';
 import Room from './Room.jsx';
 

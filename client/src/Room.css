@@ -38,6 +38,25 @@
     z-index: 3;
 }
 
+.turn-indicator {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    padding: 5px;
+    border: solid black 1px;
+    border-radius: 10px;
+    background-color: black;
+    display: flex;
+    width: 150px;
+    height: 50px;
+    z-index: 3;
+    text-align: center;
+}
+
+.turn-indicator>h2 {
+    width: 100%;
+}
+
 /* .link styling */
 .link {
     display: flex;
