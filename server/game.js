@@ -76,7 +76,6 @@ export class Game {
         this.active = 0;
         this.part2 = 0;
         this.activeCard = 0;
-        this.passiveCard = 0;
     }
 
     getPile(card) {
@@ -129,6 +128,11 @@ export class Game {
         for (let i = 0; i < 8; i++) {
             let temp = this.deck.shift()
             let tempIndex = Math.floor((temp - 1) / 4);
+            while (this.middle[tempIndex].length === 3) {
+                this.deck.push(temp);
+                temp = this.deck.shift()
+                tempIndex = Math.floor((temp - 1) / 4);
+            }
             this.middle[tempIndex].push(temp)
         }
 

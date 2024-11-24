@@ -35,6 +35,9 @@ const Home = () => {
                     <button onClick={() => handleRoomAction('stranger')}>
                         Stranger
                     </button>
+                    <button onClick={() => handleRoomAction('CPU')}>
+                        CPU
+                    </button>
                 </div>
             </div>
         </div>

@@ -19,13 +19,11 @@ const Room = () => {
     const playerRef = useRef(null);  // Track player without re-rendering
     const [activePile, setActivePile] = useState(-1);
     const [display, setDisplay] = useState(null)
-    console.log("test", playerRef.current);
     // 0: Perfectly executed
     // 1: already connected (waiting for friend)
     // 2: already connected (waiting for stranger)
     // 3: Room not available
     function callback(code) {
-        console.log(code);
         if (code === 3) {
             navigate(`/`);
         } else if (code === 2) {
@@ -35,12 +33,10 @@ const Room = () => {
         }
     }
     function setFirstCard(card) {
-        console.log('yes')
         // setActiveCard(card);
         socket.emit('move', card);
     }
     function setSecondCard(card) {
-        console.log('maybe')
         if (data.part2 === 0) {
             socket.emit('move2', card);
         } else {
@@ -50,7 +46,6 @@ const Room = () => {
     useEffect(() => {
         socket.emit('joinFriend', roomId, callback);
         socket.on('leave', () => {
-            console.log('leave')
             navigate(`/`);
         });
         socket.on('startGame', (user1, d) => {
@@ -59,7 +54,6 @@ const Room = () => {
             setData(d);
         });
         socket.on('data', (d) => {
-            console.log(d);
             setData(d);
             setActivePile(() => Math.floor((d.activeCard - 1) / 4));
         });
@@ -67,8 +61,6 @@ const Room = () => {
             startGame(false);
         });
         socket.on('winner', (winner) => {
-            console.log('won', typeof winner, winner);
-            console.log('player', typeof playerRef.current, playerRef.current);
 
             if (winner === playerRef.current) {
                 setDisplay('winner');
@@ -150,7 +142,7 @@ const Room = () => {
                         </div>
                     </div>
                     <Sidebar roomId={roomId} data={data} player={playerRef.current} />
-                </div><div className="mobile">{playerRef.current}</div></>}
+                </div><div className="mobile">This game is not mobile compatibale.</div></>}
         </div>
     );
 };

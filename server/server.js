@@ -48,7 +48,7 @@ class User {
 class Room {
 
     // 0:stranger vacant; 1: stranger full; 2: friend vacant; 3: friend full
-    static roomsByPrivacy = { 0: new Set(), 1: new Set(), 2: new Set(), 3: new Set() };
+    static roomsByPrivacy = { 0: new Set(), 1: new Set(), 2: new Set(), 3: new Set(), 4: new Set() };
 
     constructor(id, user1 = null, user2 = null, privacy = 0, game = null) {
         this.id = id;
@@ -109,13 +109,13 @@ io.on('connection', (socket) => {
         io.to(room.id).emit('users', [room.user1, room.user2]);
     }
 
-    function startGame() {  // Default delay is 1000 ms (1 second)
+    function startGame(time = 1000) {  // Default delay is 1000 ms (1 second)
         setTimeout(() => {
             room.game = new Game(room);
             io.to(room.id).emit("startGame", room.user1.id, room.game);
             sendUsers();
             sendData();
-        }, 1000);
+        }, time);
     }
 
     function endGame(room) {
@@ -132,16 +132,22 @@ io.on('connection', (socket) => {
                 room = openRooms.values().next().value;
                 room.user2 = user;
                 room.setPrivacy(1);
-                startGame(room.id);
+                startGame();
             } else {
                 room = new Room(shortid.generate(), user, null, 0, null);
             }
+        } else if (type === 'CPU') {
+            const tempid = shortid.generate()
+            room = new Room(tempid, user, { id: 'cpu', name: "CPU", roomid: tempid }, 4, null);
         } else {
             console.log('misuse of joinRoom');
         }
         rooms[room.id] = room;
         user.roomid = room.id;
         socket.join(room.id);
+        if (type === 'CPU') {
+            startGame(0);
+        }
         callback(room.id);
     });
 
@@ -151,6 +157,8 @@ io.on('connection', (socket) => {
                 callback(2);
             } else if (room.privacy === 2 || room.privacy === 3) {
                 callback(1);
+            } else if (room.privacy === 4) {
+                callback(4);
             } else {
                 console.log("This should not happen.");
                 callback(3);
@@ -162,7 +170,7 @@ io.on('connection', (socket) => {
             user.roomid = roomId;
             socket.join(room.id);
             callback(0);
-            startGame(room.id);
+            startGame();
         } else {
             callback(3);
         }
@@ -184,7 +192,7 @@ io.on('connection', (socket) => {
             Room.deleteRoom(room);
         } else if (room.privacy === 1) {
             room.setPrivacy(0);
-        } else if (room.privacy === 2) {
+        } else if (room.privacy === 2 || room.privacy === 4) {
             Room.deleteRoom(room);
             delete rooms[room.id];
         } else if (room.privacy === 3) {
@@ -217,24 +225,72 @@ io.on('connection', (socket) => {
     function completeGame(winner) {
         io.to(room.id).emit('winner', winner);
         setTimeout(() => {
-            io.to(room.id).emit('leave');
+            io.to(user.roomid).emit('leave');
         }, 3000);
 
+    }
+    function moveCPU() {
+        if (!room) {
+            return;
+        }
+        if (room.game.active === 0) {
+            return;
+        }
+
+        // send a random number from what's remaining in the hand
+        let l = (room.game.hand[1]).length;
+        let rand = Math.floor(Math.random() * l);
+        room.game.move(room.game.hand[1][rand]);
+        calculateScore();
+        if (room.game.activeCard != 0) {
+            // send a random number from what's remaining in the active Pile
+            let pile = room.game.getPile(room.game.activeCard);
+            l = (room.game.middle[pile]).length;
+            rand = Math.floor(Math.random() * l);
+            room.game.move2(room.game.middle[pile][rand]);
+            calculateScore();
+        }
+        if (room.game.activeCard != 0) {
+            // send a random number from what's remaining in the active Pile
+            let pile = room.game.getPile(room.game.activeCard);
+            l = (room.game.middle[pile]).length;
+            rand = Math.floor(Math.random() * l);
+            room.game.move2(room.game.middle[pile][rand]);
+            room.game.move3();
+            calculateScore();
+        }
+        io.to(room.id).emit("data", room.game);
     }
     socket.on('move', (activeCard) => {
         room.game.move(activeCard);
         calculateScore();
         io.to(room.id).emit("data", room.game);
+        setTimeout(() => {
+            if (room && room.privacy === 4) {
+                moveCPU();
+            }
+
+        }, 2000);
     });
     socket.on('move2', (activeCard) => {
         room.game.move2(activeCard);
         calculateScore();
         io.to(room.id).emit("data", room.game);
+        setTimeout(() => {
+            if (room && room.privacy === 4) {
+                moveCPU();
+            }
+        }, 2000);
     });
     socket.on('move3', (activeCard) => {
         room.game.move3(activeCard);
         calculateScore();
         io.to(room.id).emit("data", room.game);
+        setTimeout(() => {
+            if (room && room.privacy === 4) {
+                moveCPU();
+            }
+        }, 2000);
     });
     function sendData() {
         io.to(room.id).emit("data", room.game);
