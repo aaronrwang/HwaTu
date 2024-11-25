@@ -315,9 +315,11 @@ export class Game {
             scores[i][0] = scores[i][1] + scores[i][2] + scores[i][3] + scores[i][4]
         }
         if (scores[0][0] >= 7) {
-            return 0
+            return 0;
         } else if (scores[1][0] >= 7) {
             return 1;
+        } else if (this.hand[0].legnth === 0 && this.hand[1].legnth === 0) {
+            return 2;
         }
         return -1;
     }

@@ -145,9 +145,9 @@ io.on('connection', (socket) => {
         rooms[room.id] = room;
         user.roomid = room.id;
         socket.join(room.id);
-        if (type === 'CPU') {
-            startGame(0);
-        }
+        // if (type === 'CPU') {
+        //     startGame(0);
+        // }
         callback(room.id);
     });
 
@@ -158,6 +158,7 @@ io.on('connection', (socket) => {
             } else if (room.privacy === 2 || room.privacy === 3) {
                 callback(1);
             } else if (room.privacy === 4) {
+                startGame(500);
                 callback(4);
             } else {
                 console.log("This should not happen.");
@@ -220,6 +221,8 @@ io.on('connection', (socket) => {
             completeGame(0);
         } else if (winner === 1) {
             completeGame(1)
+        } else if (winner === 2) {
+            completeGame(2)
         }
     }
     function completeGame(winner) {

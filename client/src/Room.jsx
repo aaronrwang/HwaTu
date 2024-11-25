@@ -28,7 +28,7 @@ const Room = () => {
             navigate(`/`);
         } else if (code === 2) {
             setPublic(true);
-        } else {
+        } else if (code === 1) {
             setPrivate(true);
         }
     }
@@ -66,6 +66,8 @@ const Room = () => {
                 setDisplay('winner');
             } else if (winner === (playerRef.current + 1) % 2) {
                 setDisplay('loser');
+            } else if (winner === 2) {
+                setDisplay('draw');
             }
         })
 
@@ -83,11 +85,12 @@ const Room = () => {
             <Header page={`Room: ${roomId}`} />
             {display && display === 'winner' && <div className='waiting-screen'>
                 <h1>You Won</h1>
-
             </div>}
             {display && display === 'loser' && <div className='waiting-screen'>
                 <h1>You Lost</h1>
-
+            </div>}
+            {display && display === 'draw' && <div className='waiting-screen'>
+                <h1>Draw</h1>
             </div>}
 
             {!game && priv && <div className='waiting-screen'>
@@ -142,7 +145,7 @@ const Room = () => {
                         </div>
                     </div>
                     <Sidebar roomId={roomId} data={data} player={playerRef.current} />
-                </div><div className="mobile">This game is not mobile compatibale.</div></>}
+                </div><div className="mobile">This game is not mobile compatible.</div></>}
         </div>
     );
 };

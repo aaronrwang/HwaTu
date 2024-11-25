@@ -54,7 +54,7 @@
 
 
 .card-mini:hover .card-inner {
-    transform: translateY(30px) translateX(30px);
+    transform: translateY(-60px);
 }
 
 /* .card-inner.usable {
