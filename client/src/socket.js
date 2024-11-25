@@ -1,9 +1,7 @@
 // src/socket.js
 import { io } from 'socket.io-client';
 
-// const socket = io('https://hwatu.onrender.com'); // Replace with your server URL
-// "http://localhost:5173"
-const socket = io('https://hwatu.onrender.com', {
+const socket = io(import.meta.env.VITE_BACKEND_URL, {
     transports: ['websocket'],  // This forces WebSocket, disabling fallback to polling
     withCredentials: true  // Ensure credentials (cookies, etc.) are sent
 });
