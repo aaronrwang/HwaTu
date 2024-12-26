@@ -189,8 +189,8 @@ io.on('connection', (socket) => {
         }
         room.user2 = null;
         if (room.privacy === 0) {
-            delete rooms[room.id];
             Room.deleteRoom(room);
+            delete rooms[room.id];
         } else if (room.privacy === 1) {
             room.setPrivacy(0);
         } else if (room.privacy === 2 || room.privacy === 4) {

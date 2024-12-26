@@ -141,7 +141,7 @@ const Room = () => {
                             </div>}
                         </div>
                         <div className="p1">
-                            {(data.hand[playerRef.current]).map((card) => (<Card key={card} cardId={card} clickable={data.active === playerRef.current} onClick={() => setFirstCard(card)} />))}
+                            {(data.hand[playerRef.current]).map((card) => (<Card key={card} cardId={card} clickable={data.active === playerRef.current && data.activeCard === 0} onClick={() => setFirstCard(card)} />))}
                         </div>
                     </div>
                     <Sidebar roomId={roomId} data={data} player={playerRef.current} />
