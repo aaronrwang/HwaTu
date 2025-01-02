@@ -111,10 +111,14 @@ io.on('connection', (socket) => {
 
     function startGame(time = 1000) {  // Default delay is 1000 ms (1 second)
         setTimeout(() => {
-            room.game = new Game(room);
-            io.to(room.id).emit("startGame", room.user1.id, room.game);
-            sendUsers();
-            sendData();
+            try {
+                room.game = new Game(room);
+                io.to(room.id).emit("startGame", room.user1.id, room.game);
+                sendUsers();
+                sendData();
+            } catch (error) {
+                console.log("Room deleted before Game creation")
+            }
         }, time);
     }
 
@@ -158,7 +162,7 @@ io.on('connection', (socket) => {
             } else if (room.privacy === 2 || room.privacy === 3) {
                 callback(1);
             } else if (room.privacy === 4) {
-                startGame(500);
+                startGame(0);
                 callback(4);
             } else {
                 console.log("This should not happen.");

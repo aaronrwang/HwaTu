@@ -64,7 +64,6 @@ const cards = [
 
 export class Game {
     constructor(room) {
-        console.log("Game was made");
         this.deck = Array.from({ length: 48 }, (_, i) => (i + 1));
         this.hand = [[], []];
         this.stock = [[[[], []], [[], [], [], []], [[], []], []], [[[], []], [[], [], [], []], [[], []], []]];
@@ -211,6 +210,12 @@ export class Game {
                 this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
                 this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
                 this.moveCard(this.middle[pile][0], this.middle[pile], this.getStockPile(this.middle[pile][0]));
+            }
+            // bug caught once here hopefully this catches the bug in the future!!!
+            if ((this.middle[topcardpile]) === undefined) {
+                console.log(this.middle)
+                console.log(topcardpile)
+                console.log(topcard)
             }
             l = (this.middle[topcardpile]).length;
             this.activeCard = topcard;
