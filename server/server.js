@@ -98,12 +98,21 @@ io.on('connection', (socket) => {
 
     // Send message to room
     socket.on('message', (message) => {
-        console.log(message, user.id);
-        io.to(room.id).emit('message', user.id, message);
+        try {
+            console.log(message, user.id);
+            io.to(room.id).emit('message', user.id, message);
+        } catch (e) {
+            console.log(e);
+        }
+
     });
     socket.on('name', (name) => {
-        user.name = name;
-        sendUsers();
+        try {
+            user.name = name;
+            sendUsers();
+        } catch (e) {
+            console.log(e);
+        }
     });
     function sendUsers() {
         io.to(room.id).emit('users', [room.user1, room.user2]);
@@ -237,36 +246,46 @@ io.on('connection', (socket) => {
 
     }
     function moveCPU() {
-        if (!room) {
-            return;
-        }
-        if (room.game.active === 0) {
-            return;
+        try {
+
+            // error handling idrk
+            if (!room || !room.game) {
+                io.to(room.id).emit("leave");
+                console.log(e);
+                return;
+            }
+            if (room.game.active === 0) {
+                return;
+            }
+
+            // send a random number from what's remaining in the hand
+            let l = (room.game.hand[1]).length;
+            let rand = Math.floor(Math.random() * l);
+            room.game.move(room.game.hand[1][rand]);
+            calculateScore();
+            if (room.game.activeCard != 0) {
+                // send a random number from what's remaining in the active Pile
+                let pile = room.game.getPile(room.game.activeCard);
+                l = (room.game.middle[pile]).length;
+                rand = Math.floor(Math.random() * l);
+                room.game.move2(room.game.middle[pile][rand]);
+                calculateScore();
+            }
+            if (room.game.activeCard != 0) {
+                // send a random number from what's remaining in the active Pile
+                let pile = room.game.getPile(room.game.activeCard);
+                l = (room.game.middle[pile]).length;
+                rand = Math.floor(Math.random() * l);
+                room.game.move2(room.game.middle[pile][rand]);
+                room.game.move3();
+                calculateScore();
+            }
+            io.to(room.id).emit("data", room.game);
+        } catch (e) {
+            io.to(room.id).emit("leave");
+            console.log(e);
         }
 
-        // send a random number from what's remaining in the hand
-        let l = (room.game.hand[1]).length;
-        let rand = Math.floor(Math.random() * l);
-        room.game.move(room.game.hand[1][rand]);
-        calculateScore();
-        if (room.game.activeCard != 0) {
-            // send a random number from what's remaining in the active Pile
-            let pile = room.game.getPile(room.game.activeCard);
-            l = (room.game.middle[pile]).length;
-            rand = Math.floor(Math.random() * l);
-            room.game.move2(room.game.middle[pile][rand]);
-            calculateScore();
-        }
-        if (room.game.activeCard != 0) {
-            // send a random number from what's remaining in the active Pile
-            let pile = room.game.getPile(room.game.activeCard);
-            l = (room.game.middle[pile]).length;
-            rand = Math.floor(Math.random() * l);
-            room.game.move2(room.game.middle[pile][rand]);
-            room.game.move3();
-            calculateScore();
-        }
-        io.to(room.id).emit("data", room.game);
     }
     socket.on('move', (activeCard) => {
         room.game.move(activeCard);
