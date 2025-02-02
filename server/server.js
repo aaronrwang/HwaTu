@@ -232,11 +232,15 @@ io.on('connection', (socket) => {
         const winner = room.game.calculateScore();
         if (winner === 0) {
             completeGame(0);
+            return false;
         } else if (winner === 1) {
             completeGame(1)
+            return false;
         } else if (winner === 2) {
             completeGame(2)
+            return false;
         }
+        return true;
     }
     function completeGame(winner) {
         io.to(room.id).emit('winner', winner);
@@ -290,33 +294,39 @@ io.on('connection', (socket) => {
     socket.on('move', (activeCard) => {
         room.game.move(activeCard);
         calculateScore();
+        let end = calculateScore()
         io.to(room.id).emit("data", room.game);
-        setTimeout(() => {
-            if (room && room.privacy === 4) {
-                moveCPU();
-            }
-
-        }, 2000);
+        if (end) {
+            setTimeout(() => {
+                if (room && room.privacy === 4) {
+                    moveCPU();
+                }
+            }, 2000);
+        }
     });
     socket.on('move2', (activeCard) => {
         room.game.move2(activeCard);
-        calculateScore();
+        let end = calculateScore()
         io.to(room.id).emit("data", room.game);
-        setTimeout(() => {
-            if (room && room.privacy === 4) {
-                moveCPU();
-            }
-        }, 2000);
+        if (end) {
+            setTimeout(() => {
+                if (room && room.privacy === 4) {
+                    moveCPU();
+                }
+            }, 2000);
+        }
     });
     socket.on('move3', (activeCard) => {
         room.game.move3(activeCard);
-        calculateScore();
+        let end = calculateScore()
         io.to(room.id).emit("data", room.game);
-        setTimeout(() => {
-            if (room && room.privacy === 4) {
-                moveCPU();
-            }
-        }, 2000);
+        if (end) {
+            setTimeout(() => {
+                if (room && room.privacy === 4) {
+                    moveCPU();
+                }
+            }, 2000);
+        }
     });
     function sendData() {
         io.to(room.id).emit("data", room.game);
